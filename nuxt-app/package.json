@@ -7,11 +7,31 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "nuxt start"
   },
   "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "drizzle-orm": "^0.37.0",
+    "ethers": "^6.11.1",
     "nuxt": "^4.0.1",
     "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "zod": "^3.25.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "@pinia/nuxt": "^0.4.11",
+    "vee-validate": "^4.12.6",
+    "chart.js": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "hardhat": "^2.22.0",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.3"
   }
 }

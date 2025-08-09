@@ -1,0 +1,145 @@
+<template>
+  <section class="container-std section">
+    <div class="card max-w-xl mx-auto">
+      <div class="card-header">
+        <div>
+          <h2 class="text-xl font-semibold">Deal Creation</h2>
+          <p class="text-sm text-slate-500">거래 조건을 설정하고 스마트 계약을 생성합니다</p>
+        </div>
+      </div>
+      <form @submit.prevent="createContract" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Amount</label>
+          <input v-model.number="form.amount" type="number" min="0" step="0.01" class="input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Currency</label>
+          <select v-model="form.currency" class="input">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="KRW">KRW</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Incoterms</label>
+          <input v-model="form.incoterms" type="text" class="input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Deposit %</label>
+          <input v-model.number="form.deposit" type="number" min="0" max="100" step="1" class="input" />
+          <p v-if="form.amount" class="help">Deposit Amount: {{ depositAmount }} {{ form.currency }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Milestones</label>
+          <div class="space-y-2">
+            <div v-for="(m, idx) in form.milestones" :key="idx" class="flex space-x-2">
+              <input v-model="form.milestones[idx]" type="text" class="input flex-1" />
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="removeMilestone(idx)"
+                v-if="form.milestones.length > 1"
+              >-</button>
+            </div>
+            <button type="button" class="btn btn-secondary" @click="addMilestone">+</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Seller</label>
+          <input v-model="form.seller" type="text" class="input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Guarantor</label>
+          <input v-model="form.guarantor" type="text" class="input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Insurer</label>
+          <input v-model="form.insurer" type="text" class="input" />
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </form>
+      <div v-if="contractHash" class="mt-6">
+        <h3 class="font-semibold">Smart Contract Hash</h3>
+        <p class="font-mono text-sm break-all">{{ contractHash }}</p>
+      </div>
+      <div class="mt-6" v-if="previewRows.length">
+        <h3 class="font-semibold mb-2">Preview</h3>
+        <div class="table-wrap">
+          <table class="table">
+            <tbody class="divide-y divide-slate-200 bg-white">
+              <tr v-for="row in previewRows" :key="row.key" class="tr">
+                <th class="th text-left align-top">{{ row.label }}</th>
+                <td class="td">
+                  <template v-if="Array.isArray(row.value)">
+                    <ul class="list-disc pl-4 space-y-1">
+                      <li v-for="item in row.value" :key="item">{{ item }}</li>
+                    </ul>
+                  </template>
+                  <template v-else>
+                    {{ row.value }}
+                  </template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, computed } from 'vue'
+const router = useRouter()
+
+const form = reactive({
+  amount: 0,
+  currency: 'USD',
+  incoterms: '',
+  deposit: 0,
+  milestones: [''] as string[],
+  seller: '',
+  guarantor: '',
+  insurer: ''
+})
+
+const contractHash = ref('')
+const depositAmount = computed(() => (form.amount * form.deposit / 100).toFixed(2))
+const previewRows = computed(() => [
+  { key: 'amount', label: 'Amount', value: form.amount },
+  { key: 'currency', label: 'Currency', value: form.currency },
+  { key: 'incoterms', label: 'Incoterms', value: form.incoterms },
+  { key: 'deposit', label: 'Deposit', value: `${form.deposit}% (${depositAmount.value} ${form.currency})` },
+  { key: 'milestones', label: 'Milestones', value: form.milestones },
+  { key: 'seller', label: 'Seller', value: form.seller },
+  { key: 'guarantor', label: 'Guarantor', value: form.guarantor },
+  { key: 'insurer', label: 'Insurer', value: form.insurer }
+])
+
+function addMilestone() {
+  form.milestones.push('')
+}
+
+function removeMilestone(idx: number) {
+  form.milestones.splice(idx, 1)
+}
+
+async function createContract() {
+  form.milestones = form.milestones.map(m => m.trim()).filter(Boolean)
+  const res = await $fetch('/api/deals', {
+    method: 'POST',
+    body: {
+      amount: form.amount,
+      currency: form.currency,
+      incoterms: form.incoterms,
+      deposit_pct: form.deposit,
+      milestones: form.milestones,
+      seller: form.seller,
+      guarantor: form.guarantor,
+      insurer: form.insurer,
+    }
+  })
+  contractHash.value = res.contractHash
+  router.push(`/deals/${res.dealId}`)
+}
+</script>
