@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  nuxt:
+    build: ./nuxt-app
+    ports:
+      - "3000:3000"
+    environment:
+      CHAIN_RPC_URL: http://hardhat:8545
+    depends_on:
+      - hardhat
+  hardhat:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./nuxt-app:/app
+    command: npx hardhat node
+    ports:
+      - "8545:8545"
