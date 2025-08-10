@@ -9,6 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "start": "nuxt start",
+    "test:api": "vitest run test/api"
     "test:contracts": "npx hardhat test"
   },
   "dependencies": {
@@ -34,6 +35,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "ts-node": "^10.9.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.0"
   }
 }
