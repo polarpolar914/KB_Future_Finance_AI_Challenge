@@ -6,7 +6,7 @@ services:
       - "3000:3000"
     environment:
       CHAIN_RPC_URL: http://hardhat:8545
-      ML_SERVICE_URL: http://ml:8000/predict
+      ML_SERVICE_URL: http://ml:8000/score
     depends_on:
       - hardhat
       - ml
@@ -20,6 +20,12 @@ services:
     command: npx hardhat node
     ports:
       - "8545:8545"
+    networks:
+      - app-net
+  ml:
+    build: ./ml
+    ports:
+      - "8000:8000"
     networks:
       - app-net
   prometheus:
@@ -36,12 +42,6 @@ services:
       - "3001:3000"
     depends_on:
       - prometheus
-  ml:
-    build: ./ml-service
-    ports:
-      - "8000:8000"
-    networks:
-      - app-net
 networks:
   app-net:
     driver: bridge
