@@ -1,4 +1,5 @@
 import { db, riskScores } from '~/server/utils/db'
+import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<Record<string, any>>(event)
