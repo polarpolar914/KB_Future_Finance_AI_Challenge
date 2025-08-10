@@ -1,7 +1,7 @@
 <template>
   <section class="container-std section" v-if="deal">
     <h2 class="text-xl font-semibold mb-4">Deal {{ deal.id }}</h2>
-    <ChainStatus :deal="deal" class="mb-6" />
+    <ChainStatus :deal="deal" :chain-status="chainStatus" class="mb-6" />
     <div class="grid md:grid-cols-2 gap-4 mb-6">
       <RiskScoreCard :deal-id="deal.id" />
       <PremiumBreakdown :deal-id="deal.id" />
@@ -27,4 +27,5 @@ const { data, refresh } = await useFetch(`/api/deals/${id}`)
 
 const deal = computed(() => data.value?.deal)
 const milestones = computed(() => data.value?.milestones || [])
+const chainStatus = computed(() => data.value?.chainStatus)
 </script>

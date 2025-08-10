@@ -1,6 +1,7 @@
 import { db, deals, dealMilestones, pricing, riskScores } from '~/server/utils/db'
 import { eq, asc } from 'drizzle-orm'
 import { createError } from 'h3'
+import { getEscrowStatus } from '~/server/utils/chain'
 
 export default defineEventHandler(async (event) => {
   const id = Number(event.context.params?.id)
@@ -40,11 +41,16 @@ export default defineEventHandler(async (event) => {
       }
     : undefined
 
+  const chainStatus = deal.contract_address
+    ? await getEscrowStatus(deal.contract_address, milestones.length)
+    : null
+
   return {
     deal,
     milestones,
     premium: pricingRow,
     riskScore: riskRow?.ml_score ?? null,
     riskSubScores,
+    chainStatus,
   }
 })
