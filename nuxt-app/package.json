@@ -9,11 +9,13 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "start": "nuxt start",
+    "test:e2e": "cypress run"
     "test:api": "vitest run test/api"
     "test:contracts": "npx hardhat test"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "better-sqlite3": "^9.4.3",
     "chart.js": "^4.4.1",
     "drizzle-orm": "^0.37.0",
@@ -25,7 +27,9 @@
     "vue": "^3.5.18",
     "vue-router": "^4.5.1",
     "winston": "^3.17.0",
-    "zod": "^3.25.0"
+    "zod": "^3.25.0",
+    "cypress": "^13.3.0",
+    "vitest": "^1.6.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
@@ -36,6 +40,7 @@
     "tailwindcss": "^3.4.4",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.3",
+    "cypress": "^13.3.0"
     "vitest": "^1.6.0"
   }
 }
