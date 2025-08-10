@@ -4,8 +4,8 @@ services:
     build: ./nuxt-app
     ports:
       - "3000:3000"
-    environment:
-      CHAIN_RPC_URL: http://hardhat:8545
+    env_file:
+      - .env.development
     depends_on:
       - hardhat
   hardhat:
