@@ -49,6 +49,21 @@ export function getEscrow(address: string, signerOrProvider: Signer | JsonRpcPro
     return new Contract(address, escrowArtifact.abi, signerOrProvider)
 }
 
+export async function getEscrowStatus(address: string, milestoneCount = 0) {
+    const contract = getEscrow(address)
+    const balance: bigint = await contract.balance()
+    let confirmed = 0
+    for (let i = 0; i < milestoneCount; i++) {
+        const m = await contract.milestones(i)
+        if (m.released) confirmed++
+    }
+    return {
+        balance: balance.toString(),
+        confirmedMilestones: confirmed,
+        totalMilestones: milestoneCount,
+    }
+}
+
 export async function deployGuaranteeVault(signer: Signer) {
     if (!guaranteeArtifact) throw new Error('compile contracts first')
     const factory = new ContractFactory(guaranteeArtifact.abi, guaranteeArtifact.bytecode, signer)
