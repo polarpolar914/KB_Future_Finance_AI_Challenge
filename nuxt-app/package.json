@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "start": "nuxt start"
+    "start": "nuxt start",
+    "test:api": "vitest run test/api"
   },
   "dependencies": {
     "better-sqlite3": "^9.4.3",
@@ -32,6 +33,7 @@
     "hardhat": "^2.22.0",
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.0"
   }
 }
