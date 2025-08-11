@@ -3,19 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "build": "nuxt build",
     "start": "nuxt start",
-    "test:e2e": "cypress run"
-    "test:api": "vitest run test/api"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:e2e": "cypress run",
+    "test:api": "vitest run",
     "test:contracts": "npx hardhat test"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
-    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "better-sqlite3": "^9.4.3",
     "chart.js": "^4.4.1",
     "drizzle-orm": "^0.37.0",
@@ -23,24 +22,25 @@
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
     "nuxt": "^4.0.1",
-    "vee-validate": "^4.12.6",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1",
     "winston": "^3.17.0",
-    "zod": "^3.25.0",
-    "cypress": "^13.3.0",
-    "vitest": "^1.6.0"
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "@types/better-sqlite3": "^7.6.13",
+    "@vee-validate/nuxt": "^4.12.6",
     "autoprefixer": "^10.4.16",
+    "cypress": "^13.3.0",
+    "eslint": "^9.5.0",
     "hardhat": "^2.22.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.3",
-    "cypress": "^13.3.0"
-    "vitest": "^1.6.0"
+    "vee-validate": "^4.12.6",
+    "vitest": "^1.6.0",
+    "yup": "^1.4.0"
   }
 }

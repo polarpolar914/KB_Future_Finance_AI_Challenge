@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "h3": "^1.6.6",
+    "node-fetch": "^3.3.2"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}

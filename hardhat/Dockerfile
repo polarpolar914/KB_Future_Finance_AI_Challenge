@@ -1,0 +1,7 @@
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npx hardhat compile
+CMD ["npx","hardhat","node"]
