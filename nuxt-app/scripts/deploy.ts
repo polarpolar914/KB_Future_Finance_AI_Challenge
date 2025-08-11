@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 async function main() {
-    const provider = new ethers.JsonRpcProvider(process.env.CHAIN_RPC_URL || 'http://127.0.0.1:8545')
+    const provider = new ethers.JsonRpcProvider(process.env.CHAIN_RPC_URL || 'http://localhost:8545')
     const signer = await provider.getSigner()
     console.log('Deploying contracts with account:', await signer.getAddress())
 

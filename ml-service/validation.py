@@ -58,8 +58,3 @@ def calculate_metrics(predictions: Iterable[int], actuals: Iterable[int]) -> Dic
         "mse": mse,
     }
 
-
-if __name__ == "__main__":  # pragma: no cover - simple manual test
-    # Example usage for quick manual verification
-    metrics = calculate_metrics([1, 0, 1, 1], [1, 0, 0, 1])
-    print(metrics)
