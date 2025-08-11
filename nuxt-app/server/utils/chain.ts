@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 export const provider = new JsonRpcProvider(
-    process.env.CHAIN_RPC_URL || 'http://127.0.0.1:8545',
+    process.env.CHAIN_RPC_URL || 'http://localhost:8545',
 )
 
 const escrowArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts', 'Escrow.sol', 'Escrow.json')

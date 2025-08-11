@@ -6,7 +6,7 @@ const app = createApp();
 
 app.use('/api/risk/score', defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const url = process.env.ML_SERVICE_URL || 'http://ml:8000/score';
+  const url = process.env.ML_SERVICE_URL || 'http://localhost:8000/score';
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -22,4 +22,4 @@ app.use('/api/risk/score', defineEventHandler(async (event) => {
 }));
 
 const server = createServer(toNodeListener(app));
-server.listen(3001);
+server.listen(3001, '0.0.0.0');
