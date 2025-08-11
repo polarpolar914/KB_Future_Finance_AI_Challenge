@@ -1,47 +1,69 @@
-version: '3.8'
+version: '3.9'
+networks:
+  app-net:
+
+volumes:
+  hardhat_artifacts:
+  grafana_data:
+
 services:
-  nuxt:
-    build: ./nuxt-app
+  backend:
+    build: ./backend
+    env_file:
+      - ./.env.development
     ports:
-      - "3000:3000"
-    environment:
-      CHAIN_RPC_URL: http://hardhat:8545
-      ML_SERVICE_URL: http://ml:8000/score
-    depends_on:
-      - hardhat
-      - ml
+      - "3001:3001"
     networks:
       - app-net
-  hardhat:
-    image: node:18
-    working_dir: /app
-    volumes:
-      - ./nuxt-app:/app
-    command: npx hardhat node
-    ports:
-      - "8545:8545"
-    networks:
-      - app-net
+
   ml:
-    build: ./ml
+    build: ./ml-service
+    env_file:
+      - ./.env.development
     ports:
       - "8000:8000"
     networks:
       - app-net
+
+  hardhat:
+    build: ./hardhat
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./hardhat:/app
+      - hardhat_artifacts:/app/artifacts
+    networks:
+      - app-net
+
+  nuxt:
+    build: ./nuxt-app
+    env_file:
+      - ./.env.development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - ml
+      - hardhat
+    volumes:
+      - hardhat_artifacts:/usr/src/app/artifacts:ro
+    networks:
+      - app-net
+
   prometheus:
     image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    depends_on:
-      - nuxt
+    networks:
+      - app-net
+
   grafana:
     image: grafana/grafana
     ports:
-      - "3001:3000"
-    depends_on:
-      - prometheus
-networks:
-  app-net:
-    driver: bridge
+      - "3005:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - app-net
