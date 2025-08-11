@@ -11,7 +11,8 @@
     "test": "vitest",
     "test:e2e": "cypress run",
     "test:api": "vitest run",
-    "test:contracts": "npx hardhat test"
+    "test:contracts": "npx hardhat test",
+    "oracle:listen": "node --loader ts-node/esm server/workers/oracle-listener.ts"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
