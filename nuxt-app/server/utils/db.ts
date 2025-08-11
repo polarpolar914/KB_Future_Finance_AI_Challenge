@@ -92,3 +92,10 @@ export const pricing = sqliteTable('pricing', {
   premium_rate: real('premium_rate'),
   premium_amount: real('premium_amount'),
 })
+
+export const claimNfts = sqliteTable('claim_nfts', {
+  id: integer('id').primaryKey(),
+  deal_id: integer('deal_id').references(() => deals.id),
+  token_id: text('token_id'),
+  metadata: text('metadata'),
+})

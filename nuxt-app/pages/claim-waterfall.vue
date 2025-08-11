@@ -25,8 +25,12 @@
       </div>
       <div>
         <h3 class="font-semibold mb-2">ClaimNFT</h3>
-        <p v-if="nftId" class="badge badge-brand">NFT Issued: {{ nftId }}</p>
-        <button v-else class="btn btn-primary" @click="issueNFT">Issue ClaimNFT</button>
+        <p v-if="nftStatus === 'issued'" class="badge badge-ok">NFT Issued: {{ nftId }}</p>
+        <p v-else-if="nftStatus === 'pending'" class="badge badge-brand">Issuing...</p>
+        <template v-else>
+          <p class="badge bg-slate-100 text-slate-600">Not issued</p>
+          <button class="btn btn-primary mt-2" @click="issueNFT">Issue ClaimNFT</button>
+        </template>
       </div>
     </div>
   </section>
@@ -38,11 +42,19 @@ import { ref, computed } from 'vue'
 const steps = ['Escrow Payout', 'Vault Payout', 'Insurance Pool Payout']
 const current = ref(0)
 const nftId = ref('')
+const nftStatus = ref<'idle' | 'pending' | 'issued'>('idle')
 const progressPercent = computed(() => ((current.value) / (steps.length - 1) * 100).toFixed(0) + '%')
 
 async function issueNFT() {
-  const res = await $fetch<{ id: string }>('/api/claim/issueNFT', { method: 'POST' })
-  nftId.value = res.id
+  nftStatus.value = 'pending'
+  try {
+    const res = await $fetch<{ id: string }>('/api/claim/issueNFT', { method: 'POST' })
+    nftId.value = res.id
+    nftStatus.value = 'issued'
+  } catch (err) {
+    nftStatus.value = 'idle'
+    throw err
+  }
 }
 
 async function nextStep() {
