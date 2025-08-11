@@ -80,6 +80,7 @@ export const payoutRequests = sqliteTable('payout_requests', {
 export const documents = sqliteTable('documents', {
   id: integer('id').primaryKey(),
   name: text('name'),
+  path: text('path'),
   status: text('status'),
 })
 

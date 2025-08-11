@@ -1,6 +1,7 @@
-import { db, deals, dealMilestones } from '~/server/utils/db'
+import { db, deals, dealMilestones, stats, pricing, eventLogs } from '~/server/utils/db'
 import { z } from 'zod'
-import { deployEscrow, provider } from '~/server/utils/chain'
+import { deployEscrow, provider, getGuaranteeVault, getInsurancePool } from '~/server/utils/chain'
+import { eq } from 'drizzle-orm'
 
 const schema = z.object({
   amount: z.number().positive(),
@@ -37,6 +38,7 @@ export default defineEventHandler(async (event) => {
 
   const now = new Date().toISOString()
   let dealId = 0
+  let premium = 0
   await db.transaction(async (tx) => {
     const res = await tx
       .insert(deals)
@@ -66,7 +68,62 @@ export default defineEventHandler(async (event) => {
       }))
       await tx.insert(dealMilestones).values(ms)
     }
+
+    if (data.guarantor) {
+      const gRow = await tx.select().from(stats).where(eq(stats.key, 'guarantee_balance')).get()
+      const gBal = Number(gRow?.value || 0)
+      const lockAmt = Math.min(gBal, data.amount)
+      await tx
+        .update(stats)
+        .set({ value: String(gBal - lockAmt) })
+        .where(eq(stats.key, 'guarantee_balance'))
+      await tx.insert(eventLogs).values({
+        deal_id: dealId,
+        source: 'APP',
+        event_type: 'GUARANTEE',
+        message: `Guarantor locked ${lockAmt} USD`,
+      })
+    }
+
+    if (data.insurer) {
+      const pRow = await tx
+        .select()
+        .from(pricing)
+        .where(eq(pricing.deal_id, dealId))
+        .get()
+      premium = Number(pRow?.premium_amount || 0)
+      const poolRow = await tx.select().from(stats).where(eq(stats.key, 'pool_balance')).get()
+      const poolBal = Number(poolRow?.value || 0) + premium
+      await tx.update(stats).set({ value: String(poolBal) }).where(eq(stats.key, 'pool_balance'))
+      await tx.insert(eventLogs).values({
+        deal_id: dealId,
+        source: 'APP',
+        event_type: 'INSURANCE',
+        message: `Premium ${premium} USD paid to pool`,
+      })
+    }
   })
+
+  // Optional on-chain interactions
+  if (data.guarantor && process.env.GUARANTEE_VAULT_ADDRESS) {
+    try {
+      const signer = await provider.getSigner()
+      const vault = getGuaranteeVault(process.env.GUARANTEE_VAULT_ADDRESS, signer)
+      await vault.lock(dealId, BigInt(Math.floor(data.amount)))
+    } catch (err) {
+      console.error('GuaranteeVault lock failed', err)
+    }
+  }
+
+  if (data.insurer && process.env.INSURANCE_POOL_ADDRESS) {
+    try {
+      const signer = await provider.getSigner()
+      const pool = getInsurancePool(process.env.INSURANCE_POOL_ADDRESS, signer)
+      await pool.registerDeal(dealId, data.insurer, BigInt(Math.floor(premium)))
+    } catch (err) {
+      console.error('InsurancePool register failed', err)
+    }
+  }
 
   return { dealId, contractAddress, contractHash }
 })
