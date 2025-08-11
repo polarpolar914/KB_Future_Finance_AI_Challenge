@@ -58,9 +58,14 @@
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
       </form>
+      <p v-if="error" class="text-red-500 text-sm mt-4">{{ error }}</p>
       <div v-if="contractHash" class="mt-6">
         <h3 class="font-semibold">Smart Contract Hash</h3>
-        <p class="font-mono text-sm break-all">{{ contractHash }}</p>
+        <div class="flex items-center gap-2">
+          <p class="font-mono text-sm break-all">{{ contractHash }}</p>
+          <button type="button" class="btn btn-secondary btn-xs" @click="copyHash">Copy</button>
+        </div>
+        <p v-if="copied" class="text-xs text-green-600 mt-1">Copied to clipboard</p>
       </div>
       <div class="mt-6" v-if="previewRows.length">
         <h3 class="font-semibold mb-2">Preview</h3>
@@ -104,6 +109,8 @@ const form = reactive({
 })
 
 const contractHash = ref('')
+const error = ref('')
+const copied = ref(false)
 const depositAmount = computed(() => (form.amount * form.deposit / 100).toFixed(2))
 const previewRows = computed(() => [
   { key: 'amount', label: 'Amount', value: form.amount },
@@ -117,6 +124,7 @@ const previewRows = computed(() => [
 ])
 
 function addMilestone() {
+  if (!form.milestones[form.milestones.length - 1]?.trim()) return
   form.milestones.push('')
 }
 
@@ -124,22 +132,37 @@ function removeMilestone(idx: number) {
   form.milestones.splice(idx, 1)
 }
 
+async function copyHash() {
+  await navigator.clipboard.writeText(contractHash.value)
+  copied.value = true
+  setTimeout(() => (copied.value = false), 2000)
+}
+
 async function createContract() {
+  error.value = ''
   form.milestones = form.milestones.map(m => m.trim()).filter(Boolean)
-  const res = await $fetch('/api/deals', {
-    method: 'POST',
-    body: {
-      amount: form.amount,
-      currency: form.currency,
-      incoterms: form.incoterms,
-      deposit_pct: form.deposit,
-      milestones: form.milestones,
-      seller: form.seller,
-      guarantor: form.guarantor,
-      insurer: form.insurer,
-    }
-  })
-  contractHash.value = res.contractHash
-  router.push(`/deals/${res.dealId}`)
+  if (!form.amount || !form.currency || !form.incoterms || !form.milestones.length) {
+    error.value = 'Please fill all required fields'
+    return
+  }
+  try {
+    const res = await $fetch('/api/deals', {
+      method: 'POST',
+      body: {
+        amount: form.amount,
+        currency: form.currency,
+        incoterms: form.incoterms,
+        deposit_pct: form.deposit,
+        milestones: form.milestones,
+        seller: form.seller,
+        guarantor: form.guarantor,
+        insurer: form.insurer,
+      }
+    })
+    contractHash.value = res.contractHash
+    router.push(`/deals/${res.dealId}`)
+  } catch (e: any) {
+    error.value = e.statusMessage || e.message || 'Failed to create deal'
+  }
 }
 </script>

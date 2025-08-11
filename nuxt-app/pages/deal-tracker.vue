@@ -13,7 +13,8 @@
           <span :class="['badge', status.time ? 'badge-ok' : (status.name === currentStatus ? 'badge-brand' : 'badge-warn')]">{{ status.time || 'pending' }}</span>
         </li>
       </ul>
-      <button class="btn btn-primary mb-6" @click="advance" :disabled="finished">Advance Status</button>
+      <button class="btn btn-primary mb-2" @click="advance" :disabled="finished">Advance Status</button>
+      <p v-if="finished" class="badge badge-ok mb-4">Deal completed</p>
       <h3 class="font-semibold mb-2">Payment History</h3>
       <div class="table-wrap">
         <table class="table">
@@ -48,9 +49,13 @@ const currentStatus = ref(flow[0])
 const finished = ref(false)
 const progressPercent = computed(() => (currentIndex.value / (flow.length - 1) * 100).toFixed(0) + '%')
 
-function advance() {
+async function advance() {
   const now = new Date().toISOString()
   statuses.value[currentIndex.value].time = now
+  await $fetch('/api/deal-tracker/advance', {
+    method: 'POST',
+    body: { status: currentStatus.value, time: now }
+  })
   if (currentIndex.value < flow.length - 1) {
     currentIndex.value++
     currentStatus.value = flow[currentIndex.value]
