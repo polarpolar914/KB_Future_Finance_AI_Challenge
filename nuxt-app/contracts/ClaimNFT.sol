@@ -1,23 +1,43 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+/// @title ClaimNFT - minimal NFT representing insurance claim certificates
+contract ClaimNFT {
+    string public constant name = "ClaimNFT";
+    string public constant symbol = "CLM";
 
-/// @title ClaimNFT - NFT representing insurance claim certificates
-contract ClaimNFT is ERC721URIStorage {
     uint256 public nextTokenId;
 
-    constructor() ERC721("ClaimNFT", "CLM") {}
+    struct Certificate {
+        uint256 dealId;
+        uint256 payoutAmount;
+    }
 
-    /// @notice Mint a new claim NFT to `to` with metadata `tokenURI`
-    /// @return tokenId The newly issued token id
-    function issue(address to, string memory tokenURI)
-        external
-        returns (uint256 tokenId)
-    {
+    mapping(uint256 => Certificate) public certificates;
+    mapping(uint256 => address) public ownerOf;
+    mapping(address => uint256) public balanceOf;
+    mapping(uint256 => string) private _tokenURIs;
+
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event CertificateIssued(uint256 indexed tokenId, uint256 indexed dealId, uint256 payoutAmount);
+
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
+        require(ownerOf[tokenId] != address(0), "nonexistent token");
+        return _tokenURIs[tokenId];
+    }
+
+    function issueCertificate(
+        address to,
+        uint256 dealId,
+        uint256 payoutAmount,
+        string memory uri
+    ) external returns (uint256 tokenId) {
         tokenId = ++nextTokenId;
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, tokenURI);
+        ownerOf[tokenId] = to;
+        balanceOf[to] += 1;
+        _tokenURIs[tokenId] = uri;
+        certificates[tokenId] = Certificate(dealId, payoutAmount);
+        emit Transfer(address(0), to, tokenId);
+        emit CertificateIssued(tokenId, dealId, payoutAmount);
     }
 }
-
