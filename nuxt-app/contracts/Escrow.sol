@@ -4,6 +4,8 @@ pragma solidity ^0.8.20;
 contract Escrow {
     address public payer;
     address public payee;
+    address public insurer;
+    uint256 public dealId;
 
     struct Milestone {
         uint256 amount;
@@ -11,14 +13,27 @@ contract Escrow {
     }
 
     Milestone[] public milestones;
+    bool public cancelled;
+    bool public defaultDeclared;
 
     event Deposited(address indexed from, uint256 amount);
     event MilestoneConfirmed(uint256 indexed index);
     event FundsReleased(uint256 amount);
+    event DealCancelled(uint256 indexed dealId, address indexed by);
+    event DefaultDeclared(uint256 indexed dealId, address indexed by);
+    event ClaimIssued(uint256 indexed dealId, address indexed by);
 
-    constructor(address _payer, address _payee, uint256[] memory _amounts) {
+    constructor(
+        uint256 _dealId,
+        address _payer,
+        address _payee,
+        address _insurer,
+        uint256[] memory _amounts
+    ) {
+        dealId = _dealId;
         payer = _payer;
         payee = _payee;
+        insurer = _insurer;
         for (uint i = 0; i < _amounts.length; i++) {
             milestones.push(Milestone({ amount: _amounts[i], released: false }));
         }
@@ -26,11 +41,13 @@ contract Escrow {
 
     function deposit() external payable {
         require(msg.sender == payer, 'only payer');
+        require(!cancelled && !defaultDeclared, 'deal ended');
         emit Deposited(msg.sender, msg.value);
     }
 
     function confirmMilestone(uint index) external {
         require(msg.sender == payer, 'only payer');
+        require(!cancelled && !defaultDeclared, 'deal ended');
         Milestone storage m = milestones[index];
         require(!m.released, 'already released');
         require(address(this).balance >= m.amount, 'insufficient');
@@ -42,6 +59,7 @@ contract Escrow {
 
     function releaseFunds() external {
         require(msg.sender == payer, 'only payer');
+        require(!cancelled && !defaultDeclared, 'deal ended');
         uint bal = address(this).balance;
         payable(payee).transfer(bal);
         emit FundsReleased(bal);
@@ -49,5 +67,26 @@ contract Escrow {
 
     function balance() external view returns (uint) {
         return address(this).balance;
+    }
+
+    function cancelDeal() external {
+        require(msg.sender == payer || msg.sender == payee, 'only parties');
+        require(!cancelled && !defaultDeclared, 'deal ended');
+        cancelled = true;
+        uint bal = address(this).balance;
+        if (bal > 0) {
+            payable(payer).transfer(bal);
+            emit FundsReleased(bal);
+        }
+        emit DealCancelled(dealId, msg.sender);
+        emit ClaimIssued(dealId, msg.sender);
+    }
+
+    function declareDefault() external {
+        require(msg.sender == payer || msg.sender == payee, 'only parties');
+        require(!cancelled && !defaultDeclared, 'deal ended');
+        defaultDeclared = true;
+        emit DefaultDeclared(dealId, msg.sender);
+        emit ClaimIssued(dealId, msg.sender);
     }
 }
