@@ -22,10 +22,12 @@
           <div class="text-lg font-semibold">{{ balances.seller }} USD</div>
         </div>
       </div>
-      <div class="flex flex-wrap gap-2 mb-6">
-        <button class="btn btn-primary" @click="paySeller">Pay Seller 1000</button>
-        <button class="btn btn-secondary" @click="claimVault">Claim Vault 500</button>
-        <button class="btn btn-secondary" @click="claimPool">Claim Pool 500</button>
+      <div class="flex flex-wrap gap-2 mb-6 items-center">
+        <input v-model.number="amount" type="number" min="0" class="input w-24" placeholder="Amount" />
+        <button class="btn btn-primary" @click="paySeller" :disabled="amount<=0">Pay Seller</button>
+        <button class="btn btn-secondary" @click="claimVault" :disabled="amount<=0">Claim Vault</button>
+        <button class="btn btn-secondary" @click="claimPool" :disabled="amount<=0">Claim Pool</button>
+        <button class="btn btn-ghost" @click="sync">Sync</button>
       </div>
       <h3 class="font-semibold mb-2">Flow Log</h3>
       <div class="table-wrap">
@@ -69,6 +71,7 @@ const parse = (l: any): Log => {
   return { id: l.id, from: parts[0], to: parts[2], amount: Number(parts[3]) }
 }
 const logs = ref((logData.value || []).map(parse))
+const amount = ref(0)
 
 async function sync() {
   await refreshStats()
@@ -86,14 +89,14 @@ async function transfer(from: string, to: string, amount: number) {
 }
 
 function paySeller() {
-  transfer('escrow', 'seller', 1000)
+  transfer('escrow', 'seller', amount.value)
 }
 
 function claimVault() {
-  transfer('vault', 'escrow', 500)
+  transfer('vault', 'escrow', amount.value)
 }
 
 function claimPool() {
-  transfer('pool', 'escrow', 500)
+  transfer('pool', 'escrow', amount.value)
 }
 </script>
