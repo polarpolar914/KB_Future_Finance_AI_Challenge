@@ -129,11 +129,20 @@ INSERT INTO payout_requests (deal, amount, status) VALUES
 CREATE TABLE IF NOT EXISTS documents (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT,
+  path TEXT,
   status TEXT
 );
 
-INSERT INTO documents (name, status) VALUES
-('Invoice.pdf', 'Verified');
+INSERT INTO documents (name, path, status) VALUES
+('Invoice.pdf', '/uploads/Invoice.pdf', 'Verified');
+
+-- claim_nfts
+CREATE TABLE IF NOT EXISTS claim_nfts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deal_id INTEGER REFERENCES deals(id) ON DELETE CASCADE,
+  token_id TEXT,
+  metadata TEXT
+);
 
 -- pricing
 CREATE TABLE IF NOT EXISTS pricing (
