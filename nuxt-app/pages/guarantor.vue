@@ -45,17 +45,20 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-const { data: statsData } = await useFetch('/api/stats', {
+const { data: statsData, refresh: refreshStats } = await useFetch('/api/stats', {
   params: { keys: 'guarantee_limit,guarantee_balance' },
 })
 const limit = computed(() => Number(statsData.value?.guarantee_limit || 0))
 const balance = computed(() => Number(statsData.value?.guarantee_balance || 0))
 
-const { data: reqData } = await useFetch('/api/guarantor/requests')
+const { data: reqData, refresh: refreshReqs } = await useFetch('/api/guarantor/requests')
 const requests = computed(() => reqData.value || [])
 const approvedIds = ref<number[]>([])
 
-function approve(id: number) {
-  if (!approvedIds.value.includes(id)) approvedIds.value.push(id)
+async function approve(id: number) {
+  if (approvedIds.value.includes(id)) return
+  await $fetch('/api/guarantor/approve', { method: 'POST', body: { id } })
+  approvedIds.value.push(id)
+  await Promise.all([refreshReqs(), refreshStats()])
 }
 </script>

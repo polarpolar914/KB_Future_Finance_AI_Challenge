@@ -40,12 +40,14 @@ const current = ref(0)
 const nftId = ref('')
 const progressPercent = computed(() => ((current.value) / (steps.length - 1) * 100).toFixed(0) + '%')
 
-function issueNFT() {
-  nftId.value = 'claim-' + Math.random().toString(36).slice(2)
+async function issueNFT() {
+  const res = await $fetch<{ id: string }>('/api/claim/issueNFT', { method: 'POST' })
+  nftId.value = res.id
 }
 
-function nextStep() {
+async function nextStep() {
   if (current.value < steps.length - 1) {
+    await $fetch('/api/claim/distribute', { method: 'POST', body: { step: current.value } })
     current.value++
   }
 }
