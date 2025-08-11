@@ -18,6 +18,10 @@ const insuranceArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts',
 const insuranceArtifact = fs.existsSync(insuranceArtifactPath)
     ? JSON.parse(fs.readFileSync(insuranceArtifactPath, 'utf8'))
     : null
+const claimArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts', 'ClaimNFT.sol', 'ClaimNFT.json')
+const claimArtifact = fs.existsSync(claimArtifactPath)
+    ? JSON.parse(fs.readFileSync(claimArtifactPath, 'utf8'))
+    : null
 
 const logDir = path.join(process.cwd(), 'event_logs')
 function log(file: string, data: unknown) {
@@ -107,4 +111,19 @@ export async function deployInsurancePool(signer: Signer) {
 export function getInsurancePool(address: string, signerOrProvider: Signer | JsonRpcProvider = provider) {
     if (!insuranceArtifact) throw new Error('compile contracts first')
     return new Contract(address, insuranceArtifact.abi, signerOrProvider)
+}
+
+export async function deployClaimNFT(signer: Signer) {
+    if (!claimArtifact) throw new Error('compile contracts first')
+    const factory = new ContractFactory(claimArtifact.abi, claimArtifact.bytecode, signer)
+    const contract = await factory.deploy()
+    const tx = contract.deploymentTransaction()
+    if (tx) log('transactions.log', { type: 'deploy', hash: tx.hash })
+    await contract.waitForDeployment()
+    return contract as Contract
+}
+
+export function getClaimNFT(address: string, signerOrProvider: Signer | JsonRpcProvider = provider) {
+    if (!claimArtifact) throw new Error('compile contracts first')
+    return new Contract(address, claimArtifact.abi, signerOrProvider)
 }

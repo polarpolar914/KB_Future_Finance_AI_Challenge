@@ -83,23 +83,29 @@ const factors = computed(() => [
 ])
 
 async function calculate() {
-  // basic deterministic risk scoring
-  const lenScore =
-    input.counterparty.length * 0.5 +
-    input.goods.length * 0.3 +
-    input.route.length * 0.2
-  score.value = Math.min(100, Math.round(lenScore))
+  const res = await $fetch<{ score: number }>('/api/risk/score', {
+    method: 'POST',
+    body: {
+      features: {
+        counterparty: input.counterparty,
+        goods: input.goods,
+        route: input.route,
+      },
+    },
+  })
+  score.value = Math.min(100, Math.round(res.score || 0))
   const quote = await $fetch<{ premium_rate: number; premium_amount: number }>(
-      '/api/pricing/quote',
-      {
-        method: 'POST',
-        body: {
-          baseRate,
-          mlScore: score.value / 100,
-          marketAdjustment,
-          baseAmount,
-        },
-      }
+    '/api/pricing/quote',
+    {
+      method: 'POST',
+      body: {
+        dealId: 1,
+        baseRate,
+        mlScore: score.value / 100,
+        marketAdjustment,
+        baseAmount,
+      },
+    },
   )
   breakdown.value = {
     base_rate: baseRate,
