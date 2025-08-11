@@ -13,8 +13,12 @@
           <NuxtLink to="/claim-waterfall" class="hover:text-slate-900">Claims</NuxtLink>
         </nav>
         <div class="flex items-center gap-2">
-          <button class="btn btn-secondary px-4 py-2">Login</button>
-          <button class="btn btn-primary px-4 py-2">Sign Up</button>
+          <template v-if="!auth.token">
+            <NuxtLink to="/login" class="btn btn-secondary px-4 py-2">Login</NuxtLink>
+          </template>
+          <template v-else>
+            <button class="btn btn-secondary px-4 py-2" @click="auth.logout()">Logout</button>
+          </template>
         </div>
       </div>
    </header>
@@ -23,3 +27,7 @@
     </main>
   </div>
 </template>
+
+<script setup lang="ts">
+const auth = useAuthStore();
+</script>
