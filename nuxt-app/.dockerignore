@@ -1,0 +1,12 @@
+node_modules
+.nuxtrc
+.nuxt
+.DS_Store
+.git
+.gitignore
+.dockerignore
+Dockerfile
+cypress
+cypress.config.ts
+coverage
+*.log
