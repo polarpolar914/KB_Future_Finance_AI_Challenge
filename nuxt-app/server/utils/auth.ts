@@ -70,14 +70,14 @@ export async function authGuard(event: any, requiredRoles: string[] = []) {
   }
 }
 
-export async function findOrCreateUser(email: string, name?: string) {
+export async function findOrCreateUser(email: string, name?: string, password?: string) {
   let user = db.select().from(users).where(eq(users.email, email)).get()
   if (!user) {
     const res = db
       .insert(users)
-      .values({ email, name, created_at: new Date().toISOString() })
+      .values({ email, name, password, created_at: new Date().toISOString() })
       .run()
-    user = { id: res.lastInsertRowid as number, email, name }
+    user = { id: res.lastInsertRowid as number, email, name, password }
     let buyerRole = db.select().from(roles).where(eq(roles.code, 'buyer')).get()
     if (!buyerRole) {
       const roleRes = db.insert(roles).values({ code: 'buyer' }).run()
@@ -85,6 +85,19 @@ export async function findOrCreateUser(email: string, name?: string) {
     }
     db.insert(userRoles).values({ user_id: user.id, role_id: buyerRole.id }).run()
   }
+  const roleRows = db
+    .select({ code: roles.code })
+    .from(userRoles)
+    .leftJoin(roles, eq(userRoles.role_id, roles.id))
+    .where(eq(userRoles.user_id, user.id))
+    .all()
+  const roleCodes = roleRows.map((r) => r.code)
+  return { user, roles: roleCodes }
+}
+
+export function authenticateUser(email: string, password: string) {
+  const user = db.select().from(users).where(eq(users.email, email)).get()
+  if (!user || user.password !== password) return null
   const roleRows = db
     .select({ code: roles.code })
     .from(userRoles)
