@@ -40,7 +40,7 @@ const config = useRuntimeConfig();
 
 const onSubmit = handleSubmit(async (vals) => {
   const res = await $fetch<{ ml_score: number; sub_scores: Record<string, number> }>(
-    `${config.apiBase}/api/risk/score`,
+    `${config.public.apiBase}/api/risk/score`,
     { method: 'POST', body: { features: vals } }
   );
   risk.setScore(res.ml_score, res.sub_scores);

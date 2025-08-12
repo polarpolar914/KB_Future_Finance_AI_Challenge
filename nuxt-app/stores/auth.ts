@@ -15,7 +15,7 @@ export const useAuthStore = defineStore('auth', {
     async login(email: string, password: string) {
       const config = useRuntimeConfig()
       await $fetch('/api/auth/password/login', {
-        baseURL: config.apiBase,
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email, password },
         credentials: 'include',
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
     async register(email: string, password: string, name?: string) {
       const config = useRuntimeConfig()
       await $fetch('/api/auth/password/register', {
-        baseURL: config.apiBase,
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email, password, name },
         credentials: 'include',
@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', {
     async requestOtp(email: string) {
       const config = useRuntimeConfig()
       await $fetch('/api/auth/otp/request', {
-        baseURL: config.apiBase,
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email },
       })
@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
     async verifyOtp(code: string, name?: string) {
       const config = useRuntimeConfig()
       await $fetch('/api/auth/otp/verify', {
-        baseURL: config.apiBase,
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email: this.email, code, name },
       })
@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       const config = useRuntimeConfig()
       await $fetch('/api/auth/logout', {
-        baseURL: config.apiBase,
+        baseURL: config.public.apiBase,
         method: 'POST',
       })
       this.isAuthenticated = false
