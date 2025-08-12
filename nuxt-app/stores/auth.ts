@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { useRuntimeConfig } from '#imports'
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -13,50 +12,30 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     async login(email: string, password: string) {
-      const config = useRuntimeConfig()
-      await $fetch('/api/auth/password/login', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
-        body: { email, password },
-        credentials: 'include',
-      })
+      const users = JSON.parse(localStorage.getItem('demo-users') || '{}')
+      if (!users[email] || users[email].password !== password) {
+        throw { statusMessage: 'Invalid email or password' }
+      }
       this.isAuthenticated = true
       this.email = email
     },
     async register(email: string, password: string, name?: string) {
-      const config = useRuntimeConfig()
-      await $fetch('/api/auth/password/register', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
-        body: { email, password, name },
-        credentials: 'include',
-      })
-      await this.login(email, password)
+      const users = JSON.parse(localStorage.getItem('demo-users') || '{}')
+      if (users[email]) {
+        throw { statusMessage: 'Email already in use' }
+      }
+      users[email] = { password, name }
+      localStorage.setItem('demo-users', JSON.stringify(users))
+      this.isAuthenticated = true
+      this.email = email
     },
     async requestOtp(email: string) {
-      const config = useRuntimeConfig()
-      await $fetch('/api/auth/otp/request', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
-        body: { email },
-      })
       this.email = email
     },
     async verifyOtp(code: string, name?: string) {
-      const config = useRuntimeConfig()
-      await $fetch('/api/auth/otp/verify', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
-        body: { email: this.email, code, name },
-      })
       this.isAuthenticated = true
     },
     async logout() {
-      const config = useRuntimeConfig()
-      await $fetch('/api/auth/logout', {
-        baseURL: config.public.apiBase,
-        method: 'POST',
-      })
       this.isAuthenticated = false
       this.email = null
     },
