@@ -1,9 +1,12 @@
 <template>
   <div class="max-w-sm mx-auto mt-10">
-    <form @submit.prevent="submit" class="flex flex-col gap-4">
-      <input v-model="username" placeholder="Username" class="input" />
-      <input v-model="password" type="password" placeholder="Password" class="input" />
-      <button type="submit" class="btn btn-primary">Login</button>
+    <form v-if="step === 'email'" @submit.prevent="request" class="flex flex-col gap-4">
+      <input v-model="email" placeholder="Email" class="input" />
+      <button type="submit" class="btn btn-primary">Send OTP</button>
+    </form>
+    <form v-else @submit.prevent="verify" class="flex flex-col gap-4">
+      <input v-model="code" placeholder="OTP Code" class="input" />
+      <button type="submit" class="btn btn-primary">Verify</button>
     </form>
   </div>
 </template>
@@ -11,12 +14,18 @@
 <script setup lang="ts">
 const auth = useAuthStore();
 const router = useRouter();
-const username = ref('');
-const password = ref('');
+const email = ref('');
+const code = ref('');
+const step = ref<'email' | 'otp'>('email');
 
-async function submit() {
+async function request() {
+  await auth.requestOtp(email.value);
+  step.value = 'otp';
+}
+
+async function verify() {
   try {
-    await auth.login(username.value, password.value);
+    await auth.verifyOtp(code.value);
     router.push('/');
   } catch (e) {
     console.error(e);

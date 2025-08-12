@@ -5,9 +5,10 @@ networks:
 volumes:
   hardhat_artifacts:
   grafana_data:
+  sqlite_data:
 
 services:
-  backend:
+  api:
     build: ./backend
     env_file:
       - ./.env.development
@@ -15,6 +16,8 @@ services:
       - "3001:3001"
     networks:
       - app-net
+    volumes:
+      - sqlite_data:/app/data
 
   ml:
     build: ./ml-service
@@ -42,11 +45,12 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      - api
       - ml
       - hardhat
     volumes:
       - hardhat_artifacts:/usr/src/app/artifacts:ro
+      - sqlite_data:/usr/src/app/data
     networks:
       - app-net
 

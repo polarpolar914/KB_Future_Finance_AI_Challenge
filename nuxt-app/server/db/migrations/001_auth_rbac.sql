@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  wallet TEXT,
+  name TEXT,
+  created_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+  id INTEGER PRIMARY KEY,
+  code TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS user_roles (
+  user_id INTEGER REFERENCES users(id),
+  role_id INTEGER REFERENCES roles(id),
+  PRIMARY KEY (user_id, role_id)
+);
+
+ALTER TABLE deals ADD COLUMN IF NOT EXISTS buyer_user_id INTEGER;
+ALTER TABLE deals ADD COLUMN IF NOT EXISTS seller_user_id INTEGER;
+
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS deal_id INTEGER;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS milestone_id INTEGER;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS doc_type TEXT;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS uploaded_by INTEGER;

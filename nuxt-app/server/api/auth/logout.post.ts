@@ -1,3 +1,1 @@
-export default defineEventHandler(() => {
-  return { success: true };
-});
+export default defineEventHandler(() => ({ ok: true }))

@@ -21,6 +21,8 @@ import PremiumBreakdown from '~/components/PremiumBreakdown.vue'
 import MilestoneList from '~/components/MilestoneList.vue'
 import ChainStatus from '~/components/ChainStatus.vue'
 
+definePageMeta({ roles: ['buyer', 'seller', 'admin'] })
+
 const route = useRoute()
 const id = route.params.id
 const { data, refresh } = await useFetch(`/api/deals/${id}`)

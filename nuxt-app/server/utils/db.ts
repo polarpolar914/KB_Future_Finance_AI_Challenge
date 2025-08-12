@@ -1,10 +1,33 @@
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
-import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, integer, text, real, primaryKey } from 'drizzle-orm/sqlite-core'
 import { join } from 'node:path'
 
-const sqlite = new Database(join(process.cwd(), 'data', 'app.db'))
+const dbDir = process.env.DB_DIR || process.cwd()
+const sqlite = new Database(join(dbDir, 'data', 'app.db'))
 export const db = drizzle(sqlite)
+
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey(),
+  email: text('email').notNull(),
+  wallet: text('wallet'),
+  name: text('name'),
+  created_at: text('created_at'),
+})
+
+export const roles = sqliteTable('roles', {
+  id: integer('id').primaryKey(),
+  code: text('code').notNull(),
+})
+
+export const userRoles = sqliteTable(
+  'user_roles',
+  {
+    user_id: integer('user_id').references(() => users.id),
+    role_id: integer('role_id').references(() => roles.id),
+  },
+  (t) => ({ pk: primaryKey(t.user_id, t.role_id) })
+)
 
 export const insuranceMarkets = sqliteTable('insurance_markets', {
   id: integer('id').primaryKey(),
@@ -26,6 +49,8 @@ export const deals = sqliteTable('deals', {
   seller: text('seller'),
   guarantor: text('guarantor'),
   insurer: text('insurer'),
+  buyer_user_id: integer('buyer_user_id').references(() => users.id),
+  seller_user_id: integer('seller_user_id').references(() => users.id),
   status: text('status'),
   contract_address: text('contract_address'),
   contract_hash: text('contract_hash'),
@@ -38,6 +63,7 @@ export const dealMilestones = sqliteTable('deal_milestones', {
   deal_id: integer('deal_id').references(() => deals.id),
   ord: integer('ord'),
   description: text('description'),
+  amount: real('amount'),
   status: text('status'),
   confirmed_at: text('confirmed_at'),
 })
@@ -82,6 +108,10 @@ export const documents = sqliteTable('documents', {
   name: text('name'),
   path: text('path'),
   status: text('status'),
+  deal_id: integer('deal_id').references(() => deals.id),
+  milestone_id: integer('milestone_id').references(() => dealMilestones.id),
+  doc_type: text('doc_type'),
+  uploaded_by: integer('uploaded_by').references(() => users.id),
 })
 
 export const pricing = sqliteTable('pricing', {

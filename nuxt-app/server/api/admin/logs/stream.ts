@@ -1,8 +1,10 @@
 import { Readable } from 'node:stream'
 import { db, eventLogs } from '~/server/utils/db'
 import { desc, gt } from 'drizzle-orm'
+import { authGuard } from '~/server/utils/auth'
 
 export default eventHandler(async (event) => {
+    await authGuard(event, ['admin'])
     setHeader(event, 'Content-Type', 'text/event-stream')
     setHeader(event, 'Cache-Control', 'no-cache')
     setHeader(event, 'Connection', 'keep-alive')

@@ -15,8 +15,8 @@ contract InsurancePool {
     mapping(uint256 => Deal) public deals;
 
     event DealRegistered(uint256 indexed dealId, address insured, uint256 premium);
-    event PoolFunded(address indexed from, uint256 amount);
-    event PayoutTriggered(uint256 indexed dealId, address to, uint256 amount);
+    event Deposit(address indexed from, uint256 amount);
+    event Payout(uint256 indexed dealId, address to, uint256 amount);
 
     constructor(address tokenAddress) {
         token = IERC20(tokenAddress);
@@ -25,7 +25,7 @@ contract InsurancePool {
     /// @notice Deposit additional funds to the insurance pool
     function fundPool(uint256 amount) external {
         require(token.transferFrom(msg.sender, address(this), amount), 'transfer failed');
-        emit PoolFunded(msg.sender, amount);
+        emit Deposit(msg.sender, amount);
     }
 
     /// @notice Register a new deal and collect premium from the caller
@@ -40,6 +40,6 @@ contract InsurancePool {
         require(deals[dealId].insured != address(0), 'unknown deal');
         require(token.balanceOf(address(this)) >= amount, 'insufficient pool');
         require(token.transfer(to, amount), 'transfer failed');
-        emit PayoutTriggered(dealId, to, amount);
+        emit Payout(dealId, to, amount);
     }
 }

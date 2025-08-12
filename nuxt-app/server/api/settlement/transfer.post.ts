@@ -1,7 +1,9 @@
 import { db, stats, eventLogs } from '~/server/utils/db'
 import { eq } from 'drizzle-orm'
+import { authGuard } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
+  await authGuard(event, ['admin'])
   const body = await readBody<{ from: string; to: string; amount: number }>(event)
   const { from, to, amount } = body
   if (!from || !to || !amount) {
