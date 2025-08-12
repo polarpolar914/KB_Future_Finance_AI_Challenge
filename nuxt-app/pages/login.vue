@@ -12,21 +12,22 @@
 </template>
 
 <script setup lang="ts">
-const auth = useAuthStore();
-const router = useRouter();
-const email = ref('');
-const code = ref('');
-const step = ref<'email' | 'otp'>('email');
+import { useAuthStore } from '~/stores/auth'
+const auth = useAuthStore()
+const router = useRouter()
+const email = ref('')
+const code = ref('')
+const step = ref<'email' | 'otp'>('email')
 
 async function request() {
-  await auth.requestOtp(email.value);
-  step.value = 'otp';
+  await auth.requestOtp(email.value)
+  step.value = 'otp'
 }
 
 async function verify() {
   try {
-    await auth.verifyOtp(code.value);
-    router.push('/');
+    await auth.verifyOtp(code.value)
+    router.push('/')
   } catch (e) {
     console.error(e);
   }

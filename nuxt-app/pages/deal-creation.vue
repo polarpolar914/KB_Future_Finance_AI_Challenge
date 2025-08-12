@@ -96,6 +96,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
+import { useAuthStore } from '~/stores/auth'
 const router = useRouter()
 definePageMeta({ roles: ['buyer'] })
 const auth = useAuthStore()

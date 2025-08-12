@@ -18,7 +18,6 @@
     "oracle:listen": "node --loader ts-node/esm server/workers/oracle-listener.ts"
   },
   "dependencies": {
-    "@pinia/nuxt": "^0.4.11",
     "better-sqlite3": "^9.4.3",
     "chart.js": "^4.4.1",
     "drizzle-orm": "^0.37.0",
@@ -26,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
     "nuxt": "^4.0.1",
+    "pinia": "^2.1.7",
     "prom-client": "^15.1.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1",
