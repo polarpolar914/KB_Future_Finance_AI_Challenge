@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
       await $fetch('/api/auth/password/login', {
         method: 'POST',
         body: { email, password },
+        credentials: 'include',
       })
       this.isAuthenticated = true
       this.email = email
@@ -23,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
       await $fetch('/api/auth/password/register', {
         method: 'POST',
         body: { email, password, name },
+        credentials: 'include',
       })
       await this.login(email, password)
     },
