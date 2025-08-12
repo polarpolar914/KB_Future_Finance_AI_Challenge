@@ -17,7 +17,6 @@ import { useAuthStore } from '~/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 const auth = useAuthStore()
-const router = useRouter()
 const loginError = ref('')
 
 const schema = yup.object({
@@ -34,7 +33,7 @@ const onSubmit = handleSubmit(async (vals) => {
   loginError.value = ''
   try {
     await auth.login(vals.email, vals.password)
-    router.push('/')
+    await navigateTo('/')
   } catch (e: any) {
     loginError.value = e.statusMessage || 'Login failed. Please check your credentials.'
   }
