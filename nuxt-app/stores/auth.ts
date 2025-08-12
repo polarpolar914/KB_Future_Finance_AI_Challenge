@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { useRuntimeConfig } from '#imports'
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -34,9 +33,7 @@ export const useAuthStore = defineStore('auth', {
       await this.login(email, password)
     },
     async requestOtp(email: string) {
-      const config = useRuntimeConfig()
       await $fetch('/api/auth/otp/request', {
-        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email },
       })
@@ -52,9 +49,7 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = true
     },
     async logout() {
-      const config = useRuntimeConfig()
       await $fetch('/api/auth/logout', {
-        baseURL: config.public.apiBase,
         method: 'POST',
       })
       this.isAuthenticated = false
