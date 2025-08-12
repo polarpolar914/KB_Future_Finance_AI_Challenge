@@ -6,6 +6,7 @@ import "./IERC20.sol";
 /// @title GuaranteeVault - manages guarantor limits and locked funds
 contract GuaranteeVault {
     IERC20 public immutable token;
+    address public owner;
 
     mapping(address => uint256) public limits;
     mapping(uint256 => uint256) public locked;
@@ -16,9 +17,15 @@ contract GuaranteeVault {
 
     constructor(address tokenAddress) {
         token = IERC20(tokenAddress);
+        owner = msg.sender;
     }
 
-    function setGuaranteeLimit(address account, uint256 limit) external {
+    modifier onlyOwner() {
+        require(msg.sender == owner, "only owner");
+        _;
+    }
+
+    function setGuaranteeLimit(address account, uint256 limit) external onlyOwner {
         limits[account] = limit;
         emit GuaranteeLimitSet(account, limit);
     }

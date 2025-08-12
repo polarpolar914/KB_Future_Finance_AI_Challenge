@@ -33,7 +33,8 @@
           <label class="block text-sm font-medium mb-1">Milestones</label>
           <div class="space-y-2">
             <div v-for="(m, idx) in form.milestones" :key="idx" class="flex space-x-2">
-              <input v-model="form.milestones[idx]" type="text" class="input flex-1" />
+              <input v-model="m.description" placeholder="Description" class="input flex-1" />
+              <input v-model.number="m.amount" type="number" placeholder="Amount" class="input w-24" />
               <button
                 type="button"
                 class="btn btn-secondary"
@@ -96,13 +97,15 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 const router = useRouter()
+definePageMeta({ roles: ['buyer'] })
+const auth = useAuthStore()
 
 const form = reactive({
   amount: 0,
   currency: 'USD',
   incoterms: '',
   deposit: 0,
-  milestones: [''] as string[],
+  milestones: [{ description: '', amount: 0 }] as { description: string; amount: number }[],
   seller: '',
   guarantor: '',
   insurer: ''
@@ -117,15 +120,16 @@ const previewRows = computed(() => [
   { key: 'currency', label: 'Currency', value: form.currency },
   { key: 'incoterms', label: 'Incoterms', value: form.incoterms },
   { key: 'deposit', label: 'Deposit', value: `${form.deposit}% (${depositAmount.value} ${form.currency})` },
-  { key: 'milestones', label: 'Milestones', value: form.milestones },
+  { key: 'milestones', label: 'Milestones', value: form.milestones.map(m => `${m.description}: ${m.amount}`) },
   { key: 'seller', label: 'Seller', value: form.seller },
   { key: 'guarantor', label: 'Guarantor', value: form.guarantor },
   { key: 'insurer', label: 'Insurer', value: form.insurer }
 ])
 
 function addMilestone() {
-  if (!form.milestones[form.milestones.length - 1]?.trim()) return
-  form.milestones.push('')
+  const last = form.milestones[form.milestones.length - 1]
+  if (!last.description) return
+  form.milestones.push({ description: '', amount: 0 })
 }
 
 function removeMilestone(idx: number) {
@@ -140,27 +144,24 @@ async function copyHash() {
 
 async function createContract() {
   error.value = ''
-  form.milestones = form.milestones.map(m => m.trim()).filter(Boolean)
+  form.milestones = form.milestones.filter(m => m.description)
   if (!form.amount || !form.currency || !form.incoterms || !form.milestones.length) {
     error.value = 'Please fill all required fields'
     return
   }
   try {
-    const res = await $fetch('/api/deals', {
+    const res = await $fetch<{ id: number }>('/api/deals', {
       method: 'POST',
+      headers: { Authorization: `Bearer ${auth.token}` },
       body: {
         amount: form.amount,
         currency: form.currency,
         incoterms: form.incoterms,
         deposit_pct: form.deposit,
-        milestones: form.milestones,
-        seller: form.seller,
-        guarantor: form.guarantor,
-        insurer: form.insurer,
+        milestones: form.milestones.map((m, i) => ({ ord: i + 1, description: m.description, amount: m.amount })),
       }
     })
-    contractHash.value = res.contractHash
-    router.push(`/deals/${res.dealId}`)
+    router.push(`/deals/${res.id}`)
   } catch (e: any) {
     error.value = e.statusMessage || e.message || 'Failed to create deal'
   }

@@ -1,3 +1,7 @@
 
 models/model_v*.pkl
 __pycache__/
+node_modules/
+nuxt-app/node_modules/
+backend/node_modules/
+hardhat/node_modules/

@@ -35,14 +35,14 @@ export async function deployEscrow(payer: string, payee: string, amounts: bigint
     const contract = await factory.deploy(payer, payee, amounts)
     const tx = contract.deploymentTransaction()
     if (tx) log('transactions.log', { type: 'deploy', hash: tx.hash })
-    contract.on('Deposited', (from, value) =>
-        log('events.log', { event: 'Deposited', from, amount: value.toString() }),
+    contract.on('Deposit', (from, value) =>
+        log('events.log', { event: 'Deposit', from, amount: value.toString() }),
     )
     contract.on('MilestoneConfirmed', (idx) =>
         log('events.log', { event: 'MilestoneConfirmed', index: Number(idx) }),
     )
-    contract.on('FundsReleased', (value) =>
-        log('events.log', { event: 'FundsReleased', amount: value.toString() }),
+    contract.on('Payout', (value) =>
+        log('events.log', { event: 'Payout', amount: value.toString() }),
     )
     await contract.waitForDeployment()
     return contract as Contract
@@ -101,8 +101,8 @@ export async function deployInsurancePool(signer: Signer) {
     contract.on('DealRegistered', (dealId, insured, premium) =>
         log('events.log', { event: 'DealRegistered', dealId: dealId.toString(), insured, premium: premium.toString() }),
     )
-    contract.on('PayoutTriggered', (dealId, to, amount) =>
-        log('events.log', { event: 'PayoutTriggered', dealId: dealId.toString(), to, amount: amount.toString() }),
+    contract.on('Payout', (dealId, to, amount) =>
+        log('events.log', { event: 'Payout', dealId: dealId.toString(), to, amount: amount.toString() }),
     )
     await contract.waitForDeployment()
     return contract as Contract

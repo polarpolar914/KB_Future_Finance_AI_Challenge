@@ -2,8 +2,11 @@ import { db, deals, dealMilestones, pricing, riskScores } from '~/server/utils/d
 import { eq, asc } from 'drizzle-orm'
 import { createError } from 'h3'
 import { getEscrowStatus } from '~/server/utils/chain'
+import { authGuard } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
+  await authGuard(event, ['buyer', 'seller', 'admin'])
+
   const id = Number(event.context.params?.id)
   if (!id) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid deal id' })
@@ -12,6 +15,15 @@ export default defineEventHandler(async (event) => {
   const [deal] = await db.select().from(deals).where(eq(deals.id, id))
   if (!deal) {
     throw createError({ statusCode: 404, statusMessage: 'Deal not found' })
+  }
+
+  const user = event.context.user
+  const allowed =
+    deal.buyer_user_id === user.id ||
+    deal.seller_user_id === user.id ||
+    user.roles?.includes('admin')
+  if (!allowed) {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }
 
   const milestones = await db

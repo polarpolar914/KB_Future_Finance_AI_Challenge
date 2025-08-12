@@ -10,7 +10,6 @@ let db: any
 let dealsTable: any
 let statsTable: any
 let tmpDir: string
-let originalCwd: string
 
 beforeAll(async () => {
   // Stub Nuxt helpers
@@ -23,10 +22,9 @@ beforeAll(async () => {
     return Object.fromEntries(new URLSearchParams(query).entries())
   }
 
-  originalCwd = process.cwd()
   tmpDir = mkdtempSync(join(tmpdir(), 'nuxt-test-'))
   mkdirSync(join(tmpDir, 'data'))
-  process.chdir(tmpDir)
+  process.env.DB_DIR = tmpDir
 
   const dbModule = await import('../../server/utils/db')
   db = dbModule.db
@@ -45,6 +43,8 @@ beforeAll(async () => {
     seller TEXT,
     guarantor TEXT,
     insurer TEXT,
+    buyer_user_id INTEGER,
+    seller_user_id INTEGER,
     status TEXT,
     contract_address TEXT,
     contract_hash TEXT,
@@ -62,7 +62,7 @@ beforeAll(async () => {
 })
 
 afterAll(() => {
-  process.chdir(originalCwd)
+  delete process.env.DB_DIR
   rmSync(tmpDir, { recursive: true, force: true })
 })
 

@@ -16,9 +16,9 @@ contract Escrow {
     bool public cancelled;
     bool public defaultDeclared;
 
-    event Deposited(address indexed from, uint256 amount);
+    event Deposit(address indexed from, uint256 amount);
     event MilestoneConfirmed(uint256 indexed index);
-    event FundsReleased(uint256 amount);
+    event Payout(uint256 amount);
     event DealCancelled(uint256 indexed dealId, address indexed by);
     event DefaultDeclared(uint256 indexed dealId, address indexed by);
     event ClaimIssued(uint256 indexed dealId, address indexed by);
@@ -42,7 +42,7 @@ contract Escrow {
     function deposit() external payable {
         require(msg.sender == payer, 'only payer');
         require(!cancelled && !defaultDeclared, 'deal ended');
-        emit Deposited(msg.sender, msg.value);
+        emit Deposit(msg.sender, msg.value);
     }
 
     function confirmMilestone(uint index) external {
@@ -54,7 +54,7 @@ contract Escrow {
         m.released = true;
         payable(payee).transfer(m.amount);
         emit MilestoneConfirmed(index);
-        emit FundsReleased(m.amount);
+        emit Payout(m.amount);
     }
 
     function releaseFunds() external {
@@ -62,7 +62,7 @@ contract Escrow {
         require(!cancelled && !defaultDeclared, 'deal ended');
         uint bal = address(this).balance;
         payable(payee).transfer(bal);
-        emit FundsReleased(bal);
+        emit Payout(bal);
     }
 
     function balance() external view returns (uint) {
@@ -76,7 +76,7 @@ contract Escrow {
         uint bal = address(this).balance;
         if (bal > 0) {
             payable(payer).transfer(bal);
-            emit FundsReleased(bal);
+            emit Payout(bal);
         }
         emit DealCancelled(dealId, msg.sender);
         emit ClaimIssued(dealId, msg.sender);

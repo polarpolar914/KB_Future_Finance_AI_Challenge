@@ -46,7 +46,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-const { data: dealData } = await useFetch('/api/deals')
+definePageMeta({ roles: ['buyer'] })
+
+const { data: dealData } = await useFetch('/api/buyer/deals')
 const deals = computed(() => dealData.value || [])
 const { data: statsData, refresh: refreshStats } = await useFetch('/api/stats', {
   params: { keys: 'escrow_balance,claims' },

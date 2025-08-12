@@ -4,7 +4,7 @@ import { and, eq } from 'drizzle-orm'
 
 async function watchEscrow(dealId: number, address: string) {
   const escrow = getEscrow(address, provider)
-  escrow.on('Deposited', async (from, value) => {
+  escrow.on('Deposit', async (from, value) => {
     const amount = Number(value.toString())
     await db.transaction(async (tx) => {
       const row = await tx
@@ -20,7 +20,7 @@ async function watchEscrow(dealId: number, address: string) {
       await tx.insert(eventLogs).values({
         deal_id: dealId,
         source: 'CHAIN',
-        event_type: 'Deposited',
+        event_type: 'Deposit',
         message: JSON.stringify({ from, amount: amount.toString() })
       })
     })
@@ -39,7 +39,7 @@ async function watchEscrow(dealId: number, address: string) {
       })
     })
   })
-  escrow.on('FundsReleased', async (value) => {
+  escrow.on('Payout', async (value) => {
     const amount = Number(value.toString())
     await db.transaction(async (tx) => {
       const escrowRow = await tx
@@ -65,7 +65,7 @@ async function watchEscrow(dealId: number, address: string) {
       await tx.insert(eventLogs).values({
         deal_id: dealId,
         source: 'CHAIN',
-        event_type: 'FundsReleased',
+        event_type: 'Payout',
         message: JSON.stringify({ amount: amount.toString() })
       })
     })
@@ -101,7 +101,7 @@ async function watchInsurance(address: string) {
       })
     })
   })
-  pool.on('PayoutTriggered', async (dealId, to, amount) => {
+  pool.on('Payout', async (dealId, to, amount) => {
     const id = Number(dealId)
     const amt = Number(amount.toString())
     const now = new Date().toISOString()
@@ -113,7 +113,7 @@ async function watchInsurance(address: string) {
       await tx.insert(eventLogs).values({
         deal_id: id,
         source: 'CHAIN',
-        event_type: 'PayoutTriggered',
+        event_type: 'Payout',
         message: JSON.stringify({ to, amount: amount.toString() })
       })
       await tx.insert(payoutRequests).values({

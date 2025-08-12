@@ -19,7 +19,7 @@ contract ClaimNFT {
     mapping(uint256 => string) private _tokenURIs;
 
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-    event CertificateIssued(uint256 indexed tokenId, uint256 indexed dealId, uint256 payoutAmount);
+    event NFTIssued(uint256 indexed tokenId, uint256 indexed dealId, uint256 payoutAmount);
 
     /// @notice Returns metadata URI for `tokenId`
     function tokenURI(uint256 tokenId) external view returns (string memory) {
@@ -45,6 +45,6 @@ contract ClaimNFT {
         _tokenURIs[tokenId] = uri;
         certificates[tokenId] = Certificate(dealId, payoutAmount);
         emit Transfer(address(0), to, tokenId);
-        emit CertificateIssued(tokenId, dealId, payoutAmount);
+        emit NFTIssued(tokenId, dealId, payoutAmount);
     }
 }

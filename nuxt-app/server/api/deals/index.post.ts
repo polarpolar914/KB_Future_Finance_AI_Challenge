@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
     try {
       const signer = await provider.getSigner()
       const pool = getInsurancePool(process.env.INSURANCE_POOL_ADDRESS, signer)
-      await pool.registerDeal(dealId, data.insurer, BigInt(Math.floor(premium)))
+      await pool.registerDeal(dealId, BigInt(Math.floor(premium)))
     } catch (err) {
       console.error('InsurancePool register failed', err)
     }

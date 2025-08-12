@@ -28,6 +28,7 @@
         <button class="btn btn-secondary" @click="claimVault" :disabled="amount<=0">Claim Vault</button>
         <button class="btn btn-secondary" @click="claimPool" :disabled="amount<=0">Claim Pool</button>
         <button class="btn btn-ghost" @click="sync">Sync</button>
+        <button class="btn btn-ghost" @click="reset">Reset</button>
       </div>
       <h3 class="font-semibold mb-2">Flow Log</h3>
       <div class="table-wrap">
@@ -53,7 +54,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, onBeforeUnmount } from 'vue'
+
+definePageMeta({ roles: ['admin'] })
 
 const { data: statData, refresh: refreshStats } = await useFetch('/api/stats', {
   params: { keys: 'escrow_balance,vault_balance,pool_balance,seller_balance' },
@@ -71,6 +74,12 @@ const parse = (l: any): Log => {
   return { id: l.id, from: parts[0], to: parts[2], amount: Number(parts[3]) }
 }
 const logs = ref((logData.value || []).map(parse))
+const es = new EventSource('/api/settlement/logs/stream')
+es.onmessage = (e) => {
+  const l = JSON.parse(e.data)
+  logs.value.unshift(parse(l))
+}
+onBeforeUnmount(() => es.close())
 const amount = ref(0)
 
 async function sync() {
@@ -98,5 +107,10 @@ function claimVault() {
 
 function claimPool() {
   transfer('pool', 'escrow', amount.value)
+}
+
+async function reset() {
+  await $fetch('/api/settlement/reset', { method: 'POST' })
+  await sync()
 }
 </script>
