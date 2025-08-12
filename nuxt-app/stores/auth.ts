@@ -1,4 +1,5 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
+import { useRuntimeConfig } from '#imports'
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -12,7 +13,9 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     async login(email: string, password: string) {
+      const config = useRuntimeConfig()
       await $fetch('/api/auth/password/login', {
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email, password },
         credentials: 'include',
@@ -21,7 +24,9 @@ export const useAuthStore = defineStore('auth', {
       this.email = email
     },
     async register(email: string, password: string, name?: string) {
+      const config = useRuntimeConfig()
       await $fetch('/api/auth/password/register', {
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email, password, name },
         credentials: 'include',
@@ -29,18 +34,29 @@ export const useAuthStore = defineStore('auth', {
       await this.login(email, password)
     },
     async requestOtp(email: string) {
-      await $fetch('/api/auth/otp/request', { method: 'POST', body: { email } })
+      const config = useRuntimeConfig()
+      await $fetch('/api/auth/otp/request', {
+        baseURL: config.public.apiBase,
+        method: 'POST',
+        body: { email },
+      })
       this.email = email
     },
     async verifyOtp(code: string, name?: string) {
+      const config = useRuntimeConfig()
       await $fetch('/api/auth/otp/verify', {
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email: this.email, code, name },
       })
       this.isAuthenticated = true
     },
     async logout() {
-      await $fetch('/api/auth/logout', { method: 'POST' })
+      const config = useRuntimeConfig()
+      await $fetch('/api/auth/logout', {
+        baseURL: config.public.apiBase,
+        method: 'POST',
+      })
       this.isAuthenticated = false
       this.email = null
     },
