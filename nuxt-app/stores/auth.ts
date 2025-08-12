@@ -13,6 +13,14 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     load() {
       if (process.client) {
+        const users = JSON.parse(localStorage.getItem('demo-users') || '{}')
+        if (Object.keys(users).length === 0) {
+          localStorage.setItem('demo-users', JSON.stringify({
+            'buyer@example.com': { password: '1234567890', name: 'Buyer' },
+            'seller@example.com': { password: '1234567890', name: 'Seller' },
+            'insurer@example.com': { password: '1234567890', name: 'Insurer' },
+          }))
+        }
         const email = localStorage.getItem('demo-auth-email')
         if (email) {
           this.isAuthenticated = true
