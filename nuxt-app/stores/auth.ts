@@ -12,7 +12,9 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     async login(email: string, password: string) {
+      const config = useRuntimeConfig()
       await $fetch('/api/auth/password/login', {
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email, password },
         credentials: 'include',
@@ -21,7 +23,9 @@ export const useAuthStore = defineStore('auth', {
       this.email = email
     },
     async register(email: string, password: string, name?: string) {
+      const config = useRuntimeConfig()
       await $fetch('/api/auth/password/register', {
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email, password, name },
         credentials: 'include',
@@ -36,7 +40,9 @@ export const useAuthStore = defineStore('auth', {
       this.email = email
     },
     async verifyOtp(code: string, name?: string) {
+      const config = useRuntimeConfig()
       await $fetch('/api/auth/otp/verify', {
+        baseURL: config.public.apiBase,
         method: 'POST',
         body: { email: this.email, code, name },
       })
