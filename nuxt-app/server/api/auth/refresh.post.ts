@@ -4,7 +4,7 @@ import { getUserWithRoles, issueTokens } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const refresh = getCookie(event, 'refresh') || body.refresh
+  const refresh = getCookie(event, 'refresh_token') || body.refresh
   try {
     const payload: any = jwt.verify(refresh, process.env.REFRESH_SECRET || 'refresh')
     const data = getUserWithRoles(payload.id)
@@ -12,12 +12,20 @@ export default defineEventHandler(async (event) => {
       throw new Error('user not found')
     }
     const tokens = issueTokens(data.user, data.roles)
-    setCookie(event, 'refresh', tokens.refresh, {
+    setCookie(event, 'access_token', tokens.access, {
       httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
+      path: '/',
+    })
+    setCookie(event, 'refresh_token', tokens.refresh, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
       maxAge: 14 * 24 * 3600,
       path: '/',
     })
-    return { access: tokens.access }
+    return { success: true }
   } catch {
     throw createError({ statusCode: 401, statusMessage: 'Invalid refresh token' })
   }

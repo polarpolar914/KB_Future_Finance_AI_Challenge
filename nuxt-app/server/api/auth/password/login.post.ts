@@ -1,21 +1,27 @@
 import { readBody, createError, setCookie } from 'h3'
 import { authenticateUser, issueTokens } from '../../../utils/auth'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { email, password } = body
-  if (!email || !password) {
-    throw createError({ statusCode: 400, statusMessage: 'Email and password required' })
-  }
+  const schema = z.object({ email: z.string().email(), password: z.string() })
+  const { email, password } = schema.parse(body)
   const res = authenticateUser(email, password)
   if (!res) {
     throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
   }
   const tokens = issueTokens(res.user, res.roles)
-  setCookie(event, 'refresh', tokens.refresh, {
+  setCookie(event, 'access_token', tokens.access, {
     httpOnly: true,
-    maxAge: 14 * 24 * 3600,
+    sameSite: 'strict',
+    secure: true,
     path: '/',
   })
-  return { access: tokens.access }
+  setCookie(event, 'refresh_token', tokens.refresh, {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+    path: '/',
+  })
+  return { success: true }
 })

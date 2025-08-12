@@ -20,6 +20,14 @@ export default defineEventHandler(async (event) => {
   if (!file || !file.filename || !file.data || !dealId || !milestoneId) {
     throw createError({ statusCode: 400, statusMessage: 'Missing fields' })
   }
+  const allowed = ['application/pdf', 'image/png', 'image/jpeg']
+  if (!allowed.includes(file.type || '')) {
+    throw createError({ statusCode: 400, statusMessage: 'Unsupported file type' })
+  }
+  const maxSize = 5 * 1024 * 1024
+  if ((file.data as Buffer).length > maxSize) {
+    throw createError({ statusCode: 413, statusMessage: 'File too large (max 5MB)' })
+  }
 
   const [deal] = await db.select().from(dealsTable).where(eq(dealsTable.id, dealId))
   if (!deal || deal.seller_user_id !== userId) {
@@ -48,6 +56,7 @@ export default defineEventHandler(async (event) => {
     deal_id: dealId,
     milestone_id: milestoneId,
     doc_type: docType,
+    mime_type: file.type,
     uploaded_by: userId,
   })
   await db.insert(eventLogs).values({
