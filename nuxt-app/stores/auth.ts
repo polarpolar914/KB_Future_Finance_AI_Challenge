@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -29,7 +29,10 @@ export const useAuthStore = defineStore('auth', {
       await this.login(email, password)
     },
     async requestOtp(email: string) {
-      await $fetch('/api/auth/otp/request', { method: 'POST', body: { email } })
+      await $fetch('/api/auth/otp/request', {
+        method: 'POST',
+        body: { email },
+      })
       this.email = email
     },
     async verifyOtp(code: string, name?: string) {
@@ -40,7 +43,9 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = true
     },
     async logout() {
-      await $fetch('/api/auth/logout', { method: 'POST' })
+      await $fetch('/api/auth/logout', {
+        method: 'POST',
+      })
       this.isAuthenticated = false
       this.email = null
     },
