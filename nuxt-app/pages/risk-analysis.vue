@@ -8,6 +8,7 @@
         <div>
           <label class="block text-sm font-medium mb-1">Counterparty</label>
           <input v-model="input.counterparty" type="text" class="input" />
+          <p class="help">Demo counterparty: {{ demoUsers.seller.email }}</p>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Goods</label>
@@ -62,10 +63,11 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import PremiumBreakdown from "~/components/PremiumBreakdown.vue";
+import { demoUsers } from '~/data/demo-users'
 
 definePageMeta({ roles: ['buyer', 'insurer'] })
 
-const input = reactive({ counterparty: '', goods: '', route: '' })
+const input = reactive({ counterparty: demoUsers.seller.email, goods: '', route: '' })
 const score = ref(0)
 const breakdown = ref<null | {
   base_rate: number
