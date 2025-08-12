@@ -3,7 +3,7 @@ import { authGuard } from '../../utils/auth'
 import { db, riskScores } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
-  await authGuard(event)
+  await authGuard(event, ['buyer', 'insurer'])
   const body = await readBody(event)
   const { deal_id, features } = body
   const url = process.env.ML_SERVICE_URL || 'http://localhost:3001/api/risk/score'

@@ -41,6 +41,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+definePageMeta({ roles: ['insurer'] })
+
 const { data: statsData } = await useFetch('/api/stats', { params: { keys: 'pool_balance' } })
 const poolBalance = computed(() => Number(statsData.value?.pool_balance || 0))
 const coverage = ref(80)

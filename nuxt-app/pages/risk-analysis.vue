@@ -63,6 +63,8 @@
 import { reactive, ref, computed } from 'vue'
 import PremiumBreakdown from "~/components/PremiumBreakdown.vue";
 
+definePageMeta({ roles: ['buyer', 'insurer'] })
+
 const input = reactive({ counterparty: '', goods: '', route: '' })
 const score = ref(0)
 const breakdown = ref<null | {

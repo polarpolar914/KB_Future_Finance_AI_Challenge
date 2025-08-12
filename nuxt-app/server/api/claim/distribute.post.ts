@@ -1,9 +1,11 @@
 import { db, eventLogs, stats, deals } from '~/server/utils/db'
 import { eq } from 'drizzle-orm'
 import { issueClaimNFT } from './issueNFT.post'
-import { createError } from 'h3'
+import { createError, readBody } from 'h3'
+import { authGuard } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
+  await authGuard(event, ['admin'])
   const body = await readBody<{ step: number; dealId?: number; amount?: number }>(event)
   const step = body.step ?? 0
   const dealId = body.dealId ?? 1
