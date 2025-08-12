@@ -15,7 +15,8 @@ export default defineNuxtConfig({
   },
   vite: {
     server: {
-      host: true
+      host: true,
+      allowedHosts: ['kbai.dongwoo.dev'],
     }
   },
   nitro: {
@@ -27,6 +28,7 @@ export default defineNuxtConfig({
   vite: {
     server: {
       host: true,
+      allowedHosts: ['kbai.dongwoo.dev'],
     }
   }
 })
