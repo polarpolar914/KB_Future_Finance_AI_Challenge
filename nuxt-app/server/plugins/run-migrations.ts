@@ -1,9 +1,13 @@
 import { join } from 'node:path'
-import { readdirSync, readFileSync, existsSync } from 'node:fs'
+import { readdirSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
 import Database from 'better-sqlite3'
 
 export default defineNitroPlugin(() => {
-  const dbPath = join(process.cwd(), 'data', 'app.db')
+  const dataDir = join(process.cwd(), 'data')
+  if (!existsSync(dataDir)) {
+    mkdirSync(dataDir, { recursive: true })
+  }
+  const dbPath = join(dataDir, 'app.db')
   const db = new Database(dbPath)
   const migrationsDir = join(process.cwd(), 'server/db/migrations')
   try {

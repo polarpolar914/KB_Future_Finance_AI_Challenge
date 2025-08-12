@@ -13,6 +13,11 @@ export default defineNuxtConfig({
       autoprefixer: {}
     }
   },
+  vite: {
+    server: {
+      host: true
+    }
+  },
   nitro: {
     routeRules: {
       // ensure built assets are served statically to avoid router warnings
