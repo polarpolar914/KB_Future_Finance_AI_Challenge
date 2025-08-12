@@ -48,14 +48,17 @@
         <div>
           <label class="block text-sm font-medium mb-1">Seller</label>
           <input v-model="form.seller" type="text" class="input" />
+          <p class="help">Demo seller: {{ demoUsers.seller.email }}</p>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Guarantor</label>
           <input v-model="form.guarantor" type="text" class="input" />
+          <p class="help">Demo guarantor: {{ demoUsers.guarantor.email }}</p>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Insurer</label>
           <input v-model="form.insurer" type="text" class="input" />
+          <p class="help">Demo insurer: {{ demoUsers.insurer.email }}</p>
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
       </form>
@@ -100,6 +103,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
+import { demoUsers } from '~/data/demo-users'
 const router = useRouter()
 definePageMeta({ roles: ['buyer'] })
 
@@ -109,9 +113,9 @@ const form = reactive({
   incoterms: '',
   deposit: 0,
   milestones: [{ description: '', amount: 0 }] as { description: string; amount: number }[],
-  seller: '',
-  guarantor: '',
-  insurer: ''
+  seller: demoUsers.seller.email,
+  guarantor: demoUsers.guarantor.email,
+  insurer: demoUsers.insurer.email
 })
 
 const contractHash = ref('')

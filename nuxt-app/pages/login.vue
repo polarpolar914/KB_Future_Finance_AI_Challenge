@@ -9,6 +9,14 @@
       <p v-if="loginError" class="text-red-500 text-sm">{{ loginError }}</p>
       <NuxtLink to="/signup" class="text-sm text-center">Sign up</NuxtLink>
     </form>
+    <div class="mt-6">
+      <p class="font-medium text-sm mb-1">Demo accounts</p>
+      <ul class="list-disc pl-4 text-sm">
+        <li v-for="(info, role) in demoUsers" :key="role">
+          {{ role }}: {{ info.email }} / {{ info.password }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -16,6 +24,7 @@
 import { useAuthStore } from '~/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
+import { demoUsers } from '~/data/demo-users'
 const auth = useAuthStore()
 const router = useRouter()
 const loginError = ref('')
