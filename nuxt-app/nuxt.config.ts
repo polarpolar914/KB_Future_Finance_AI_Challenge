@@ -18,5 +18,10 @@ export default defineNuxtConfig({
       // ensure built assets are served statically to avoid router warnings
       '/_nuxt/**': { static: true }
     }
+  },
+  vite: {
+    server: {
+      host: true,
+    }
   }
 })

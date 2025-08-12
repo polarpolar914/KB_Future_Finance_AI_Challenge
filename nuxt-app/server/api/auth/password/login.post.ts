@@ -11,17 +11,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
   }
   const tokens = issueTokens(res.user, res.roles)
-  setCookie(event, 'access_token', tokens.access, {
+  const cookieOpts = {
     httpOnly: true,
     sameSite: 'strict',
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     path: '/',
-  })
-  setCookie(event, 'refresh_token', tokens.refresh, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: true,
-    path: '/',
-  })
+  }
+  setCookie(event, 'access_token', tokens.access, cookieOpts)
+  setCookie(event, 'refresh_token', tokens.refresh, cookieOpts)
   return { success: true }
 })
