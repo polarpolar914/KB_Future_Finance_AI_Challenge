@@ -45,6 +45,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+definePageMeta({ roles: ['guarantor'] })
+
 const { data: statsData, refresh: refreshStats } = await useFetch('/api/stats', {
   params: { keys: 'guarantee_limit,guarantee_balance' },
 })

@@ -40,6 +40,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+
+definePageMeta({ roles: ['buyer', 'seller', 'admin'] })
 interface Status { name: string; time?: string }
 
 const flow = ['INITIATED', 'FUNDED', 'IN_TRANSIT', 'ARRIVED', 'INSPECTING', 'ACCEPTED']

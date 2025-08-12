@@ -1,7 +1,9 @@
+import { readBody } from 'h3'
 import { db, deals, dealMilestones, stats, pricing, eventLogs } from '~/server/utils/db'
 import { z } from 'zod'
 import { deployEscrow, provider, getGuaranteeVault, getInsurancePool } from '~/server/utils/chain'
 import { eq } from 'drizzle-orm'
+import { authGuard } from '~/server/utils/auth'
 
 const schema = z.object({
   amount: z.number().positive(),
@@ -22,6 +24,7 @@ const schema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  await authGuard(event, ['buyer'])
   const body = await readBody(event)
   const data = schema.parse(body)
 

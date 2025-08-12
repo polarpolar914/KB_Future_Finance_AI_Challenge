@@ -1,4 +1,4 @@
-import { readBody, createError } from 'h3'
+import { readBody, createError, setCookie } from 'h3'
 import { verifyOtp, findOrCreateUser, issueTokens } from '../../../utils/auth'
 
 export default defineEventHandler(async (event) => {
@@ -9,5 +9,10 @@ export default defineEventHandler(async (event) => {
   }
   const { user, roles } = await findOrCreateUser(email, name)
   const tokens = issueTokens(user, roles)
-  return tokens
+  setCookie(event, 'refresh', tokens.refresh, {
+    httpOnly: true,
+    maxAge: 14 * 24 * 3600,
+    path: '/',
+  })
+  return { access: tokens.access }
 })

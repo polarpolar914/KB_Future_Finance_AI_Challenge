@@ -1,5 +1,7 @@
 import { db, eventLogs, claimNfts } from '~/server/utils/db'
 import { getClaimNFT, provider } from '~/server/utils/chain'
+import { authGuard } from '../../utils/auth'
+import { readBody } from 'h3'
 
 /**
  * Mint a Claim NFT either on-chain (if CLAIM_NFT_ADDRESS is set) or generate
@@ -36,6 +38,7 @@ export async function issueClaimNFT(dealId: number, metadata = '') {
 }
 
 export default defineEventHandler(async (event) => {
+  await authGuard(event, ['admin'])
   const body = await readBody<{ dealId: number; metadata?: string }>(event)
   const tokenId = await issueClaimNFT(body.dealId ?? 0, body.metadata)
   return { id: tokenId }

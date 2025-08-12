@@ -4,7 +4,7 @@ import { db, pricing, riskScores } from '../../utils/db'
 import { eq, desc } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  await authGuard(event)
+  await authGuard(event, ['buyer', 'insurer'])
   const body = await readBody(event)
   const { deal_id, base_rate, market_adjustment = 0, amount } = body
   const rs = db
