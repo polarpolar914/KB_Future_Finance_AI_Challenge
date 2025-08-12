@@ -34,7 +34,7 @@ const onSubmit = handleSubmit(async (vals) => {
   loginError.value = ''
   try {
     await auth.login(vals.email, vals.password)
-    router.push('/')
+    await router.push('/')
   } catch (e: any) {
     loginError.value = e.statusMessage || 'Login failed. Please check your credentials.'
   }
