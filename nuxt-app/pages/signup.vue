@@ -38,7 +38,7 @@ const onSubmit = handleSubmit(async (vals) => {
   signupError.value = ''
   try {
     await auth.register(vals.email, vals.password, vals.name)
-    router.push('/')
+    await router.push('/')
   } catch (e: any) {
     signupError.value = e.statusMessage || 'Registration failed. Email may be already in use.'
   }
