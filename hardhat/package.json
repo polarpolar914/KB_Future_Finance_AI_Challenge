@@ -1,6 +1,9 @@
 {
   "name": "hardhat",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.22.0"
