@@ -13,7 +13,7 @@
           <NuxtLink to="/claim-waterfall" class="hover:text-slate-900">Claims</NuxtLink>
         </nav>
         <div class="flex items-center gap-2">
-          <template v-if="!auth.token">
+          <template v-if="!auth.isAuthenticated">
             <NuxtLink to="/login" class="btn btn-secondary px-4 py-2">Login</NuxtLink>
             <NuxtLink to="/signup" class="btn btn-secondary px-4 py-2">Sign Up</NuxtLink>
           </template>

@@ -13,11 +13,19 @@ export default defineEventHandler(async (event) => {
   }
   const { user, roles } = await findOrCreateUserByWallet(address)
   const tokens = issueTokens(user, roles)
-  setCookie(event, 'refresh', tokens.refresh, {
+  setCookie(event, 'access_token', tokens.access, {
     httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+    path: '/',
+  })
+  setCookie(event, 'refresh_token', tokens.refresh, {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
     maxAge: 14 * 24 * 3600,
     path: '/',
   })
-  return { access: tokens.access }
+  return { success: true }
 })
 

@@ -5,6 +5,10 @@
         <h2 class="text-xl font-semibold">Claim Waterfall</h2>
       </div>
       <div class="mb-6">
+        <select v-model="selectedDeal" class="input mb-4 w-full">
+          <option value="" disabled>Select Deal</option>
+          <option v-for="d in deals" :key="d.id" :value="d.id">Deal #{{ d.id }} - {{ d.status }}</option>
+        </select>
         <div class="h-2 bg-slate-200 rounded mb-4">
           <div class="h-full bg-brand-500 rounded" :style="{ width: progressPercent }"></div>
         </div>
@@ -37,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const steps = ['Escrow Payout', 'Vault Payout', 'Insurance Pool Payout']
 const current = ref(0)
@@ -45,10 +49,21 @@ const nftId = ref('')
 const nftStatus = ref<'idle' | 'pending' | 'issued'>('idle')
 const progressPercent = computed(() => ((current.value) / (steps.length - 1) * 100).toFixed(0) + '%')
 
+const { data: dealData } = await useFetch('/api/deals')
+const deals = computed(() => dealData.value || [])
+const selectedDeal = ref('')
+
+watch(selectedDeal, () => {
+  current.value = 0
+  nftStatus.value = 'idle'
+  nftId.value = ''
+})
+
 async function issueNFT() {
+  if (!selectedDeal.value) return
   nftStatus.value = 'pending'
   try {
-    const res = await $fetch<{ id: string }>('/api/claim/issueNFT', { method: 'POST' })
+    const res = await $fetch<{ id: string }>('/api/claim/issueNFT', { method: 'POST', body: { dealId: Number(selectedDeal.value) } })
     nftId.value = res.id
     nftStatus.value = 'issued'
   } catch (err) {
@@ -58,8 +73,8 @@ async function issueNFT() {
 }
 
 async function nextStep() {
-  if (current.value < steps.length - 1) {
-    await $fetch('/api/claim/distribute', { method: 'POST', body: { step: current.value } })
+  if (current.value < steps.length - 1 && selectedDeal.value) {
+    await $fetch('/api/claim/distribute', { method: 'POST', body: { step: current.value, dealId: Number(selectedDeal.value) } })
     current.value++
   }
 }

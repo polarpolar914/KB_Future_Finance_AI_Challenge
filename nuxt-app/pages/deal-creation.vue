@@ -60,6 +60,10 @@
         <button type="submit" class="btn btn-primary">Create</button>
       </form>
       <p v-if="error" class="text-red-500 text-sm mt-4">{{ error }}</p>
+      <p v-if="createdDealId" class="text-green-600 text-sm mt-4">
+        ✅ Deal #{{ createdDealId }} created successfully.
+        <NuxtLink :to="`/deals/${createdDealId}`" class="underline">View Deal Details</NuxtLink>
+      </p>
       <div v-if="contractHash" class="mt-6">
         <h3 class="font-semibold">Smart Contract Hash</h3>
         <div class="flex items-center gap-2">
@@ -96,10 +100,8 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
-import { useAuthStore } from '~/stores/auth'
 const router = useRouter()
 definePageMeta({ roles: ['buyer'] })
-const auth = useAuthStore()
 
 const form = reactive({
   amount: 0,
@@ -115,6 +117,7 @@ const form = reactive({
 const contractHash = ref('')
 const error = ref('')
 const copied = ref(false)
+const createdDealId = ref<number | null>(null)
 const depositAmount = computed(() => (form.amount * form.deposit / 100).toFixed(2))
 const previewRows = computed(() => [
   { key: 'amount', label: 'Amount', value: form.amount },
@@ -146,14 +149,13 @@ async function copyHash() {
 async function createContract() {
   error.value = ''
   form.milestones = form.milestones.filter(m => m.description)
-  if (!form.amount || !form.currency || !form.incoterms || !form.milestones.length) {
+  if (!form.amount || !form.currency || !form.milestones.length) {
     error.value = 'Please fill all required fields'
     return
   }
   try {
     const res = await $fetch<{ id: number }>('/api/deals', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${auth.token}` },
       body: {
         amount: form.amount,
         currency: form.currency,
@@ -162,7 +164,7 @@ async function createContract() {
         milestones: form.milestones.map((m, i) => ({ ord: i + 1, description: m.description, amount: m.amount })),
       }
     })
-    router.push(`/deals/${res.id}`)
+    createdDealId.value = res.id
   } catch (e: any) {
     error.value = e.statusMessage || e.message || 'Failed to create deal'
   }

@@ -112,6 +112,7 @@ export const documents = sqliteTable('documents', {
   deal_id: integer('deal_id').references(() => deals.id),
   milestone_id: integer('milestone_id').references(() => dealMilestones.id),
   doc_type: text('doc_type'),
+  mime_type: text('mime_type'),
   uploaded_by: integer('uploaded_by').references(() => users.id),
 })
 
