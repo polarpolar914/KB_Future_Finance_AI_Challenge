@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT NOT NULL UNIQUE,
   wallet TEXT,
   name TEXT,
+  password TEXT,
   created_at TEXT
 );
 

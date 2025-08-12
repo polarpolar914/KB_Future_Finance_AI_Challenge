@@ -12,6 +12,7 @@ export const users = sqliteTable('users', {
   email: text('email').notNull(),
   wallet: text('wallet'),
   name: text('name'),
+  password: text('password'),
   created_at: text('created_at'),
 })
 

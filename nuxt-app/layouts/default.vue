@@ -15,6 +15,7 @@
         <div class="flex items-center gap-2">
           <template v-if="!auth.token">
             <NuxtLink to="/login" class="btn btn-secondary px-4 py-2">Login</NuxtLink>
+            <NuxtLink to="/signup" class="btn btn-secondary px-4 py-2">Sign Up</NuxtLink>
           </template>
           <template v-else>
             <button class="btn btn-secondary px-4 py-2" @click="auth.logout()">Logout</button>
