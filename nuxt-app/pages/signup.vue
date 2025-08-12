@@ -20,7 +20,6 @@ import { useAuthStore } from '~/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 const auth = useAuthStore()
-const router = useRouter()
 const signupError = ref('')
 
 const schema = yup.object({
@@ -38,7 +37,7 @@ const onSubmit = handleSubmit(async (vals) => {
   signupError.value = ''
   try {
     await auth.register(vals.email, vals.password, vals.name)
-    router.push('/')
+    await navigateTo('/')
   } catch (e: any) {
     signupError.value = e.statusMessage || 'Registration failed. Email may be already in use.'
   }
