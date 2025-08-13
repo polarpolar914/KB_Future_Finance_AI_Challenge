@@ -1,7 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { mkdtempSync, rmSync, mkdirSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { describe, it, expect, beforeAll } from 'vitest'
 import { sql } from 'drizzle-orm'
 
 let getDeals: any
@@ -9,8 +6,6 @@ let getStats: any
 let db: any
 let dealsTable: any
 let statsTable: any
-let tmpDir: string
-
 beforeAll(async () => {
   // Stub Nuxt helpers
   // @ts-ignore
@@ -21,10 +16,6 @@ beforeAll(async () => {
     const query = url.split('?')[1] || ''
     return Object.fromEntries(new URLSearchParams(query).entries())
   }
-
-  tmpDir = mkdtempSync(join(tmpdir(), 'nuxt-test-'))
-  mkdirSync(join(tmpDir, 'data'))
-  process.env.DB_DIR = tmpDir
 
   const dbModule = await import('../../server/utils/db')
   db = dbModule.db
@@ -59,11 +50,6 @@ beforeAll(async () => {
 
   await db.insert(dealsTable).values({ amount: 1000, currency: 'USD', status: 'DEPLOYED' }).run()
   await db.insert(statsTable).values({ key: 'escrow_balance', value: '1000' }).run()
-})
-
-afterAll(() => {
-  delete process.env.DB_DIR
-  rmSync(tmpDir, { recursive: true, force: true })
 })
 
 describe('GET /api/deals', () => {

@@ -1,10 +1,8 @@
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { sqliteTable, integer, text, real, primaryKey } from 'drizzle-orm/sqlite-core'
-import { join } from 'node:path'
 
-const dbDir = process.env.DB_DIR || process.cwd()
-const sqlite = new Database(join(dbDir, 'data', 'app.db'))
+export const sqlite = new Database(':memory:')
 export const db = drizzle(sqlite)
 
 export const users = sqliteTable('users', {
