@@ -18,6 +18,7 @@
             <NuxtLink to="/signup" class="btn btn-secondary px-4 py-2">Sign Up</NuxtLink>
           </template>
           <template v-else>
+            <span class="text-sm text-slate-600 mr-2">{{ auth.email }} ({{ auth.role }})</span>
             <button class="btn btn-secondary px-4 py-2" @click="logout">Logout</button>
           </template>
         </div>
