@@ -1,14 +1,12 @@
-import { useStore } from 'vuex'
-
 export default defineNuxtRouteMiddleware((to) => {
   const required = (to.meta.roles as string[]) || []
   if (!required.length) return
-  const store = useStore()
-  const { isAuthenticated, role } = store.state.auth
-  if (!isAuthenticated) {
+  const auth = useAuth()
+  if (!auth.loggedIn) {
     return navigateTo('/login')
   }
-  if (role && !required.includes(role)) {
+  const roles: string[] = (auth.user as any)?.roles || []
+  if (required.length && !required.some((r) => roles.includes(r))) {
     return navigateTo('/')
   }
 })
