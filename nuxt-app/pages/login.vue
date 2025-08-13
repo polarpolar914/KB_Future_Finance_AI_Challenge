@@ -6,7 +6,6 @@
       <input v-model="values.password" type="password" placeholder="Password" class="input" />
       <span class="text-red-500 text-sm" v-if="errors.password">{{ errors.password }}</span>
       <button type="submit" class="btn btn-primary">Login</button>
-      <p v-if="loginError" class="text-red-500 text-sm">{{ loginError }}</p>
       <NuxtLink to="/signup" class="text-sm text-center">Sign up</NuxtLink>
     </form>
   </div>
@@ -14,10 +13,11 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useModalStore } from '~/stores/modal'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 const auth = useAuthStore()
-const loginError = ref('')
+const modal = useModalStore()
 
 const schema = yup.object({
   email: yup.string().email().required(),
@@ -30,12 +30,12 @@ const { handleSubmit, errors, values } = useForm<{ email: string; password: stri
 })
 
 const onSubmit = handleSubmit(async (vals) => {
-  loginError.value = ''
   try {
     await auth.login(vals.email, vals.password)
+    modal.open('로그인되었습니다.')
     await navigateTo('/')
   } catch (e: any) {
-    loginError.value = e.statusMessage || 'Login failed. Please check your credentials.'
+    modal.open(e.statusMessage || '로그인에 실패했습니다.', 'error')
   }
 })
 </script>
