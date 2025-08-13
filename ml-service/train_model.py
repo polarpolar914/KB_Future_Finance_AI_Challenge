@@ -75,6 +75,9 @@ def train() -> Path:
     # Ensure some training data exists.  If the demo dataset is missing we
     # synthesise it so that the service can operate in a self-contained manner.
     if not DATA_PATH.exists():
+        # Create the directory for the demo dataset if it has not been made
+        # yet so that data generation does not fail when writing the file.
+        DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
         generate_dummy_data(out_path=str(DATA_PATH))
 
     # Prefer real training if possible; otherwise fall back to a lightweight
