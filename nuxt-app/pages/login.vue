@@ -35,7 +35,7 @@ const onSubmit = handleSubmit(async (vals) => {
     await auth.loginWith('local', { data: { email: vals.email, password: vals.password } })
     await navigateTo('/')
   } catch (e: any) {
-    loginError.value = e?.response?.data?.statusMessage || 'Login failed. Please check your credentials.'
+    loginError.value = e?.statusMessage || 'Login failed. Please check your credentials.'
   }
 })
 

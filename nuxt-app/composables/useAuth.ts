@@ -14,6 +14,10 @@ export const useAuth = () => {
     await store.dispatch('auth/login', data)
   }
 
+  const register = async ({ email, password, name }: { email: string; password: string; name?: string }) => {
+    await store.dispatch('auth/register', { email, password, name })
+  }
+
   const logout = async () => {
     await store.dispatch('auth/logout')
   }
@@ -22,6 +26,7 @@ export const useAuth = () => {
     loggedIn,
     user,
     loginWith,
-    logout
+    logout,
+    register
   }
 }
