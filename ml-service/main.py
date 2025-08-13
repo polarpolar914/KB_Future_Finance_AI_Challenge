@@ -3,6 +3,8 @@ from pydantic import BaseModel
 import pickle
 import os
 
+from train_model import train
+
 class ScoreRequest(BaseModel):
     features: dict
 
@@ -18,9 +20,19 @@ _model = None
 def load_model():
     global _model
     if _model is None:
-        if not os.path.exists(MODEL_PATH):
-            raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
-        with open(MODEL_PATH, "rb") as f:
+        path = MODEL_PATH
+        # If the expected model file is missing we attempt to train a model
+        # using the lightweight training script. This allows the service to
+        # operate out of the box with demo data without requiring a separate
+        # preprocessing step.
+        if not os.path.exists(path):
+            try:
+                path = str(train())
+            except Exception as e:
+                raise FileNotFoundError(
+                    f"Model not found at {MODEL_PATH} and training failed: {e}"
+                )
+        with open(path, "rb") as f:
             _model = pickle.load(f)
     return _model
 

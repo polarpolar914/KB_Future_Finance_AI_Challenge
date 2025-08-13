@@ -19,5 +19,7 @@ export default defineEventHandler(async (event) => {
   }
   setCookie(event, 'access_token', tokens.access, cookieOpts)
   setCookie(event, 'refresh_token', tokens.refresh, cookieOpts)
-  return { success: true }
+  // Return the tokens and role information so the frontend can persist them and
+  // immediately know the authenticated user's permissions.
+  return { access: tokens.access, refresh: tokens.refresh, roles: res.roles }
 })

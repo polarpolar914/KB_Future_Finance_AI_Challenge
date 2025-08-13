@@ -1,27 +1,32 @@
 import { JsonRpcProvider, Contract, ContractFactory, Signer } from 'ethers'
 import fs from 'fs'
 import path from 'path'
+import { execSync } from 'child_process'
 
 export const provider = new JsonRpcProvider(
     process.env.CHAIN_RPC_URL || 'http://localhost:8545',
 )
 
-const escrowArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts', 'Escrow.sol', 'Escrow.json')
-const escrowArtifact = fs.existsSync(escrowArtifactPath)
-    ? JSON.parse(fs.readFileSync(escrowArtifactPath, 'utf8'))
-    : null
-const guaranteeArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts', 'GuaranteeVault.sol', 'GuaranteeVault.json')
-const guaranteeArtifact = fs.existsSync(guaranteeArtifactPath)
-    ? JSON.parse(fs.readFileSync(guaranteeArtifactPath, 'utf8'))
-    : null
-const insuranceArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts', 'InsurancePool.sol', 'InsurancePool.json')
-const insuranceArtifact = fs.existsSync(insuranceArtifactPath)
-    ? JSON.parse(fs.readFileSync(insuranceArtifactPath, 'utf8'))
-    : null
-const claimArtifactPath = path.join(process.cwd(), 'artifacts', 'contracts', 'ClaimNFT.sol', 'ClaimNFT.json')
-const claimArtifact = fs.existsSync(claimArtifactPath)
-    ? JSON.parse(fs.readFileSync(claimArtifactPath, 'utf8'))
-    : null
+function loadArtifact(relPath: string) {
+    const fullPath = path.join(process.cwd(), 'artifacts', 'contracts', relPath)
+    if (!fs.existsSync(fullPath)) {
+        try {
+            // Attempt to compile the contracts on-the-fly so development setups
+            // that forgot to run ``hardhat compile`` still work.
+            execSync('npx hardhat compile', { stdio: 'ignore' })
+        } catch {
+            // ignore errors; a missing artifact will be handled later
+        }
+    }
+    return fs.existsSync(fullPath)
+        ? JSON.parse(fs.readFileSync(fullPath, 'utf8'))
+        : null
+}
+
+const escrowArtifact = loadArtifact(path.join('Escrow.sol', 'Escrow.json'))
+const guaranteeArtifact = loadArtifact(path.join('GuaranteeVault.sol', 'GuaranteeVault.json'))
+const insuranceArtifact = loadArtifact(path.join('InsurancePool.sol', 'InsurancePool.json'))
+const claimArtifact = loadArtifact(path.join('ClaimNFT.sol', 'ClaimNFT.json'))
 
 const logDir = path.join(process.cwd(), 'event_logs')
 function log(file: string, data: unknown) {
