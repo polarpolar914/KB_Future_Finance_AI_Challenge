@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken'
 import { verifyMessage } from 'ethers'
 import { db, users, roles, userRoles } from './db'
 import { eq } from 'drizzle-orm'
-import { createHash } from 'node:crypto'
 
 const otpStore = new Map<string, string>()
 const nonceStore = new Map<string, string>()
@@ -54,10 +53,6 @@ export function issueTokens(user: any, rolesList: string[]) {
   return { access, refresh }
 }
 
-export function hashPassword(password: string) {
-  return createHash('sha256').update(password).digest('hex')
-}
-
 export async function authGuard(event: any, requiredRoles: string[] = []) {
   const auth = getRequestHeader(event, 'authorization')
   let token = auth?.split(' ')[1]
@@ -83,7 +78,7 @@ export async function findOrCreateUser(email: string, name?: string, password?: 
   if (!user) {
     const res = db
       .insert(users)
-      .values({ email, name, password: password ? hashPassword(password) : undefined, created_at: new Date().toISOString() })
+      .values({ email, name, password, created_at: new Date().toISOString() })
       .run()
     user = { id: res.lastInsertRowid as number, email, name, password }
     let buyerRole = db.select().from(roles).where(eq(roles.code, 'buyer')).get()
@@ -105,7 +100,7 @@ export async function findOrCreateUser(email: string, name?: string, password?: 
 
 export function authenticateUser(email: string, password: string) {
   const user = db.select().from(users).where(eq(users.email, email)).get()
-  if (!user || user.password !== hashPassword(password)) return null
+  if (!user || user.password !== password) return null
   const roleRows = db
     .select({ code: roles.code })
     .from(userRoles)

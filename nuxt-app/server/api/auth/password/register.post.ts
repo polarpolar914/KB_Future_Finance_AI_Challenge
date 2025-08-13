@@ -1,7 +1,6 @@
 import { readBody, createError } from 'h3'
 import { db, users, roles, userRoles } from '../../../utils/db'
 import { eq } from 'drizzle-orm'
-import { hashPassword } from '../../../utils/auth'
 import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
@@ -18,7 +17,7 @@ export default defineEventHandler(async (event) => {
   }
   const res = db
     .insert(users)
-    .values({ email, name, password: hashPassword(password), created_at: new Date().toISOString() })
+    .values({ email, name, password, created_at: new Date().toISOString() })
     .run()
   const userId = res.lastInsertRowid as number
   let buyerRole = db.select().from(roles).where(eq(roles.code, 'buyer')).get()
