@@ -1,24 +1,52 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import axiosModule from '@nuxtjs/axios'
+import authModule from '@nuxtjs/auth-next'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['~/assets/tailwind.css'],
-  modules: ['@vee-validate/nuxt'],
+  modules: [
+    function () { return axiosModule.call(this) },
+    function () { return authModule.call(this) },
+    '@vee-validate/nuxt'
+  ],
   runtimeConfig: {
     public: {
       apiBase: process.env.API_BASE_URL || 'http://localhost:3001'
     }
   },
+  axios: {
+    baseURL: process.env.API_BASE_URL || 'http://localhost:3001',
+    credentials: true
+  },
+  auth: {
+    redirect: {
+      login: '/login',
+      logout: '/login',
+      home: '/'
+    },
+    strategies: {
+      local: {
+        token: {
+          required: false,
+          type: false
+        },
+        endpoints: {
+          login: { url: '/api/auth/password/login', method: 'post' },
+          logout: { url: '/api/auth/logout', method: 'post' },
+          user: { url: '/api/auth/user', method: 'get' }
+        }
+      }
+    }
+  },
+  router: {
+    middleware: ['auth']
+  },
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {}
-    }
-  },
-  vite: {
-    server: {
-      host: true,
-      allowedHosts: ['kbai.dongwoo.dev'],
     }
   },
   nitro: {
@@ -30,7 +58,7 @@ export default defineNuxtConfig({
   vite: {
     server: {
       host: true,
-      allowedHosts: ['kbai.dongwoo.dev'],
+      allowedHosts: ['kbai.dongwoo.dev']
     }
   }
 })
