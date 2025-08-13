@@ -7,25 +7,22 @@ type AuthState = {
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
-    isAuthenticated: false,
-    email: null,
+    isAuthenticated: true,
+    email: 'admin@example.com',
   }),
   actions: {
     load() {
       if (process.client) {
         const users = JSON.parse(localStorage.getItem('demo-users') || '{}')
-        if (Object.keys(users).length === 0) {
-          localStorage.setItem('demo-users', JSON.stringify({
-            'buyer@example.com': { password: '1234567890', name: 'Buyer' },
-            'seller@example.com': { password: '1234567890', name: 'Seller' },
-            'insurer@example.com': { password: '1234567890', name: 'Insurer' },
-          }))
-        }
-        const email = localStorage.getItem('demo-auth-email')
-        if (email) {
-          this.isAuthenticated = true
-          this.email = email
-        }
+        users['admin@example.com'] = { password: '1234567890', name: 'Admin' }
+        users['buyer@example.com'] = { password: '1234567890', name: 'Buyer' }
+        users['seller@example.com'] = { password: '1234567890', name: 'Seller' }
+        users['guarantor@example.com'] = { password: '1234567890', name: 'Guarantor' }
+        users['insurer@example.com'] = { password: '1234567890', name: 'Insurer' }
+        localStorage.setItem('demo-users', JSON.stringify(users))
+        this.isAuthenticated = true
+        this.email = 'admin@example.com'
+        localStorage.setItem('demo-auth-email', 'admin@example.com')
       }
     },
     async login(email: string, password: string) {
