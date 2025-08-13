@@ -9,7 +9,6 @@
       <span class="text-xs text-slate-500">Password must be at least 8 characters.</span>
       <span class="text-red-500 text-sm" v-if="errors.password">{{ errors.password }}</span>
       <button type="submit" class="btn btn-primary">Sign Up</button>
-      <p v-if="signupError" class="text-red-500 text-sm">{{ signupError }}</p>
       <NuxtLink to="/login" class="text-sm text-center">Back to login</NuxtLink>
     </form>
   </div>
@@ -17,10 +16,11 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useModalStore } from '~/stores/modal'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 const auth = useAuthStore()
-const signupError = ref('')
+const modal = useModalStore()
 
 const schema = yup.object({
   email: yup.string().email().required(),
@@ -34,12 +34,12 @@ const { handleSubmit, errors, values } = useForm<{ email: string; name: string; 
 })
 
 const onSubmit = handleSubmit(async (vals) => {
-  signupError.value = ''
   try {
     await auth.register(vals.email, vals.password, vals.name)
+    modal.open('회원가입이 완료되었습니다.')
     await navigateTo('/')
   } catch (e: any) {
-    signupError.value = e.statusMessage || 'Registration failed. Email may be already in use.'
+    modal.open(e.statusMessage || '회원가입에 실패했습니다.', 'error')
   }
 })
 </script>
