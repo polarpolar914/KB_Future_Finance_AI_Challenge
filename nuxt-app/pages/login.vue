@@ -32,7 +32,7 @@ const { handleSubmit, errors, values } = useForm<{ email: string; password: stri
 const onSubmit = handleSubmit(async (vals) => {
   loginError.value = ''
   try {
-    await auth.loginWith('local', { data: { email: vals.email, password: vals.password } })
+    await auth.login({ email: vals.email, password: vals.password })
     await navigateTo('/')
   } catch (e: any) {
     loginError.value = e?.statusMessage || 'Login failed. Please check your credentials.'

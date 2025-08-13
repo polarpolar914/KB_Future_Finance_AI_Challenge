@@ -15,8 +15,12 @@ export const useAuth = () => {
     }
   })
 
-  const loginWith = async (_strategy: string, { data }: { data: { email: string; password: string } }) => {
-    await store.dispatch('auth/login', data)
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    await store.dispatch('auth/login', { email, password })
+  }
+
+  const register = async ({ email, password, name }: { email: string; password: string; name?: string }) => {
+    await store.dispatch('auth/register', { email, password, name })
   }
 
   const logout = async () => {
@@ -26,7 +30,8 @@ export const useAuth = () => {
   return {
     loggedIn,
     user,
-    loginWith,
+    login,
+    register,
     logout
   }
 }

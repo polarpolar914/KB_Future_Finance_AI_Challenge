@@ -4,20 +4,27 @@
       <div class="card-header">
         <h2 class="text-xl font-semibold">Risk Analysis & Premium</h2>
       </div>
-      <form @submit.prevent="calculate" class="space-y-4">
+      <div v-if="demo" class="p-4 text-sm text-slate-500">
+        Demo mode with sample data. Log in to run your own analysis.
+      </div>
+      <form
+        @submit.prevent="calculate"
+        class="space-y-4"
+        :class="{ 'opacity-50 pointer-events-none': demo }"
+      >
         <div>
           <label class="block text-sm font-medium mb-1">Counterparty</label>
-          <input v-model="input.counterparty" type="text" class="input" />
+          <input v-model="input.counterparty" type="text" class="input" :disabled="demo" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Goods</label>
-          <input v-model="input.goods" type="text" class="input" />
+          <input v-model="input.goods" type="text" class="input" :disabled="demo" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Route</label>
-          <input v-model="input.route" type="text" class="input" />
+          <input v-model="input.route" type="text" class="input" :disabled="demo" />
         </div>
-        <button type="submit" class="btn btn-primary">Analyze</button>
+        <button type="submit" class="btn btn-primary" :disabled="demo">Analyze</button>
       </form>
       <div v-if="score" class="mt-6">
         <div class="mb-4">
@@ -60,10 +67,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import PremiumBreakdown from "~/components/PremiumBreakdown.vue";
+import { useAuth } from '~/composables/useAuth'
 
-definePageMeta({ roles: ['buyer', 'insurer'] })
+const auth = useAuth()
+const demo = computed(() => !auth.loggedIn.value)
 
 const input = reactive({ counterparty: '', goods: '', route: '' })
 const score = ref(0)
@@ -84,7 +93,25 @@ const factors = computed(() => [
   { label: 'Route', value: input.route, weight: 0.2 }
 ])
 
+onMounted(() => {
+  if (demo.value) {
+    input.counterparty = 'Demo Trading Co.'
+    input.goods = 'Electronics'
+    input.route = 'KR → US'
+    score.value = 72
+    breakdown.value = {
+      base_rate: baseRate,
+      ml_score: 0.72,
+      market_adjustment: marketAdjustment,
+      base_amount: baseAmount,
+      premium_rate: 0.036,
+      premium_amount: 36,
+    }
+  }
+})
+
 async function calculate() {
+  if (demo.value) return
   const res = await $fetch<{ score: number }>('/api/risk/score', {
     method: 'POST',
     body: {
