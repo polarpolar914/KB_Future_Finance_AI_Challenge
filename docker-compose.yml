@@ -42,6 +42,9 @@ services:
     build: ./nuxt-app
     env_file:
       - ./.env.development
+    environment:
+      HOST: 0.0.0.0
+      DB_DIR: /app
     ports:
       - "3000:3000"
     depends_on:
@@ -49,8 +52,8 @@ services:
       - ml
       - hardhat
     volumes:
-      - hardhat_artifacts:/usr/src/app/artifacts:ro
-      - sqlite_data:/usr/src/app/data
+      - hardhat_artifacts:/app/artifacts:ro
+      - sqlite_data:/app/data
     networks:
       - app-net
 
