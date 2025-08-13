@@ -15,6 +15,7 @@ from typing import Any
 
 # Versioning helpers (must exist alongside this script)
 from model_version import get_version, update_version
+from generate_dummy_data import main as generate_dummy_data
 
 # ---- Constants (kept compatible with original script expectations) ----
 BASE_DIR = Path(__file__).resolve().parent
@@ -71,7 +72,14 @@ def train() -> Path:
     """
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Prefer real training if possible; otherwise fall back to dummy model.
+    # Ensure some training data exists.  If the demo dataset is missing we
+    # synthesise it so that the service can operate in a self-contained manner.
+    if not DATA_PATH.exists():
+        generate_dummy_data(out_path=str(DATA_PATH))
+
+    # Prefer real training if possible; otherwise fall back to a lightweight
+    # dummy model.  Any errors from the real training path simply trigger the
+    # dummy model so that startup never fails.
     try:
         model = _train_real_model()
     except Exception:

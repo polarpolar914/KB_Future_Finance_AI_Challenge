@@ -13,7 +13,11 @@ def main(n: int = 500, out_path: str = "dummy_data.csv") -> None:
         "network_health": rng.uniform(0, 100, n),
     }
     df = pd.DataFrame(data)
-    df["ml_score"] = df.mean(axis=1) + rng.normal(0, 5, n)
+    # The training pipeline expects a ``target`` column containing the value the
+    # model should learn to predict.  For demo purposes we synthesise the target
+    # from the feature means with a bit of noise so that the model has something
+    # resembling a signal to fit on.
+    df["target"] = df.mean(axis=1) + rng.normal(0, 5, n)
     df.to_csv(out_path, index=False)
 
 
