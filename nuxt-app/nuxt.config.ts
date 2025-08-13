@@ -4,15 +4,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['~/assets/tailwind.css'],
-  modules: ['@nuxtjs/axios', '@vee-validate/nuxt'],
+  modules: ['@vee-validate/nuxt'],
   runtimeConfig: {
     public: {
       apiBase: process.env.API_BASE_URL || 'http://localhost:3001'
     }
-  },
-  axios: {
-    baseURL: process.env.API_BASE_URL || 'http://localhost:3001',
-    credentials: true
   },
   postcss: {
     plugins: {
