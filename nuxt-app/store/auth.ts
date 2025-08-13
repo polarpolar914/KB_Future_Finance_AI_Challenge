@@ -7,6 +7,17 @@ interface AuthState {
   role: string | null;
 }
 
+interface User {
+  email: string
+  roles?: string[]
+}
+
+interface LoginResponse {
+  access: string
+  refresh: string
+  roles?: string[]
+}
+
 const auth: Module<AuthState, any> = {
   namespaced: true,
   state: () => ({
@@ -31,7 +42,7 @@ const auth: Module<AuthState, any> = {
         const token = localStorage.getItem('access_token')
         if (token) {
           try {
-            const user: any = await $fetch('/api/auth/user', {
+            const user: User = await $fetch('/api/auth/user', {
               headers: { Authorization: `Bearer ${token}` },
             })
             commit('setAuthenticated', true)
@@ -45,7 +56,7 @@ const auth: Module<AuthState, any> = {
     },
     async login({ commit }, { email, password }: { email: string; password: string }) {
       if (process.client) {
-        const data: any = await $fetch('/api/auth/password/login', {
+        const data: LoginResponse = await $fetch('/api/auth/password/login', {
           method: 'POST',
           body: { email, password },
           credentials: 'include',
@@ -55,6 +66,15 @@ const auth: Module<AuthState, any> = {
         commit('setAuthenticated', true)
         commit('setEmail', email)
         commit('setRole', data.roles?.[0] || null)
+      }
+    },
+    async register({ dispatch }, { email, password, name }: { email: string; password: string; name?: string }) {
+      if (process.client) {
+        await $fetch('/api/auth/password/register', {
+          method: 'POST',
+          body: { email, password, name },
+        })
+        await dispatch('login', { email, password })
       }
     },
     async logout({ commit }) {

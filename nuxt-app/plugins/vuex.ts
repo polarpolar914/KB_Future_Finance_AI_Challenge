@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 import auth from '~/store/auth'
 import risk from '~/store/risk'
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
   const store = createStore({
     modules: {
       auth,
@@ -10,4 +10,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   })
   nuxtApp.vueApp.use(store)
+  if (process.client) {
+    await store.dispatch('auth/load')
+  }
 })
