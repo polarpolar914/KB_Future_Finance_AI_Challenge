@@ -19,7 +19,6 @@
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 
-const { $axios } = useNuxtApp()
 const auth = useAuth()
 const signupError = ref('')
 
@@ -37,15 +36,10 @@ const { handleSubmit, errors, values } = useForm<{ email: string; name: string; 
 const onSubmit = handleSubmit(async (vals) => {
   signupError.value = ''
   try {
-    await $axios.$post('/api/auth/password/register', {
-      email: vals.email,
-      password: vals.password,
-      name: vals.name,
-    })
-    await auth.loginWith('local', { data: { email: vals.email, password: vals.password } })
+    await auth.register({ email: vals.email, password: vals.password, name: vals.name })
     await navigateTo('/')
   } catch (e: any) {
-    signupError.value = e?.response?.data?.statusMessage || 'Registration failed. Email may be already in use.'
+    signupError.value = e?.statusMessage || 'Registration failed. Email may be already in use.'
   }
 })
 
