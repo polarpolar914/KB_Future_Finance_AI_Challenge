@@ -25,10 +25,10 @@
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
     "nuxt": "^4.0.1",
-    "pinia": "^2.1.7",
     "prom-client": "^15.1.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1",
+    "vuex": "^4.1.0",
     "winston": "^3.17.0",
     "zod": "^3.25.0"
   },

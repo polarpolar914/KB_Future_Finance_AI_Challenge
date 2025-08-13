@@ -22,9 +22,10 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
-import { useRiskStore } from '~/stores/useRiskStore';
+import { useStore } from 'vuex';
 
-const risk = useRiskStore();
+const store = useStore();
+const risk = store.state.risk;
 
 const schema = yup.object({
   amount: yup.number().required().min(1),
@@ -43,6 +44,6 @@ const onSubmit = handleSubmit(async (vals) => {
     `${config.public.apiBase}/api/risk/score`,
     { method: 'POST', body: { features: vals } }
   );
-  risk.setScore(res.ml_score, res.sub_scores);
+  store.commit('risk/setScore', { score: res.ml_score, sub: res.sub_scores });
 });
 </script>

@@ -16,10 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-const auth = useAuthStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const signupError = ref('')
 
 const schema = yup.object({
@@ -36,7 +36,11 @@ const { handleSubmit, errors, values } = useForm<{ email: string; name: string; 
 const onSubmit = handleSubmit(async (vals) => {
   signupError.value = ''
   try {
-    await auth.register(vals.email, vals.password, vals.name)
+    await store.dispatch('auth/register', {
+      email: vals.email,
+      password: vals.password,
+      name: vals.name,
+    })
     await navigateTo('/')
   } catch (e: any) {
     signupError.value = e.statusMessage || 'Registration failed. Email may be already in use.'
