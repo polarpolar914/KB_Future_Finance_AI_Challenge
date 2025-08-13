@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import axiosModule from '@nuxtjs/axios'
-import authModule from '@nuxtjs/auth-next'
+import authModule from '@nuxtjs/auth'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
