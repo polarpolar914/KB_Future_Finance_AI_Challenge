@@ -1,8 +1,29 @@
-import { createApp, toNodeListener, defineEventHandler, readBody, createError } from 'h3';
+import {
+  createApp,
+  toNodeListener,
+  defineEventHandler,
+  readBody,
+  createError,
+  eventHandler
+} from 'h3';
 import fetch from 'node-fetch';
 import { createServer } from 'node:http';
 
 const app = createApp();
+
+// Enable CORS for all routes
+app.use(
+  eventHandler((event) => {
+    const { req, res } = event.node;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type');
+    if (req.method === 'OPTIONS') {
+      res.statusCode = 204;
+      return '';
+    }
+  })
+);
 
 app.use('/api/risk/score', defineEventHandler(async (event) => {
   const body = await readBody(event);
