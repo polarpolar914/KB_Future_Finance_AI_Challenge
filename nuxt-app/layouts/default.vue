@@ -18,7 +18,7 @@
             <NuxtLink to="/signup" class="btn btn-secondary px-4 py-2">Sign Up</NuxtLink>
           </template>
           <template v-else>
-            <button class="btn btn-secondary px-4 py-2" @click="auth.logout()">Logout</button>
+            <button class="btn btn-secondary px-4 py-2" @click="logout">Logout</button>
           </template>
         </div>
       </div>
@@ -30,8 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import { useStore } from 'vuex'
 import { onMounted } from 'vue'
-const auth = useAuthStore()
-onMounted(() => auth.load())
+const store = useStore()
+const auth = store.state.auth
+onMounted(() => store.dispatch('auth/load'))
+const logout = () => store.dispatch('auth/logout')
 </script>

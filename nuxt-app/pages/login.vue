@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-const auth = useAuthStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const loginError = ref('')
 
 const schema = yup.object({
@@ -32,7 +32,7 @@ const { handleSubmit, errors, values } = useForm<{ email: string; password: stri
 const onSubmit = handleSubmit(async (vals) => {
   loginError.value = ''
   try {
-    await auth.login(vals.email, vals.password)
+    await store.dispatch('auth/login', { email: vals.email, password: vals.password })
     await navigateTo('/')
   } catch (e: any) {
     loginError.value = e.statusMessage || 'Login failed. Please check your credentials.'
