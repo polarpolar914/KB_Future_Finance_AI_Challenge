@@ -109,9 +109,9 @@ const form = reactive({
   incoterms: '',
   deposit: 0,
   milestones: [{ description: '', amount: 0 }] as { description: string; amount: number }[],
-  seller: '',
-  guarantor: '',
-  insurer: ''
+  seller: 'seller@example.com',
+  guarantor: 'guarantor@example.com',
+  insurer: 'insurer@example.com'
 })
 
 const contractHash = ref('')
