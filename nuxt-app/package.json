@@ -30,7 +30,9 @@
     "vue-router": "^4.5.1",
     "vuex": "^4.1.0",
     "winston": "^3.17.0",
-    "zod": "^3.25.0"
+    "zod": "^3.25.0",
+    "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/auth-next": "^5.0.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",

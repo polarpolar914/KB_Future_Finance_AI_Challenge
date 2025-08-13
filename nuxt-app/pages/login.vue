@@ -15,8 +15,8 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-import { useStore } from 'vuex'
-const store = useStore()
+
+const auth = useAuth()
 const loginError = ref('')
 
 const schema = yup.object({
@@ -32,10 +32,12 @@ const { handleSubmit, errors, values } = useForm<{ email: string; password: stri
 const onSubmit = handleSubmit(async (vals) => {
   loginError.value = ''
   try {
-    await store.dispatch('auth/login', { email: vals.email, password: vals.password })
+    await auth.loginWith('local', { data: { email: vals.email, password: vals.password } })
     await navigateTo('/')
   } catch (e: any) {
-    loginError.value = e.statusMessage || 'Login failed. Please check your credentials.'
+    loginError.value = e?.response?.data?.statusMessage || 'Login failed. Please check your credentials.'
   }
 })
+
+definePageMeta({ middleware: ['guest'], auth: false })
 </script>

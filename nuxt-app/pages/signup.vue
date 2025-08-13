@@ -18,8 +18,9 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-import { useStore } from 'vuex'
-const store = useStore()
+
+const { $axios } = useNuxtApp()
+const auth = useAuth()
 const signupError = ref('')
 
 const schema = yup.object({
@@ -36,14 +37,17 @@ const { handleSubmit, errors, values } = useForm<{ email: string; name: string; 
 const onSubmit = handleSubmit(async (vals) => {
   signupError.value = ''
   try {
-    await store.dispatch('auth/register', {
+    await $axios.$post('/api/auth/password/register', {
       email: vals.email,
       password: vals.password,
       name: vals.name,
     })
+    await auth.loginWith('local', { data: { email: vals.email, password: vals.password } })
     await navigateTo('/')
   } catch (e: any) {
-    signupError.value = e.statusMessage || 'Registration failed. Email may be already in use.'
+    signupError.value = e?.response?.data?.statusMessage || 'Registration failed. Email may be already in use.'
   }
 })
+
+definePageMeta({ middleware: ['guest'], auth: false })
 </script>
